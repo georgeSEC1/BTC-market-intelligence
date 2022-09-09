@@ -68,18 +68,6 @@ while(True):
     instance = str(random.randint(0,10000000))
     time.sleep(5)
     os.system('CLS')
-    f = open("bitcoin_contempory_addr_associate.btc", "a", encoding="utf8")
-    print("Analysing addresses")
-    for line in lines:
-        if line.find("\'block_time\': ") > -1:
-            array = produce(line)
-            for segment in array:
-                if int(segment) > int(unixTime) and int(segment) < int(unixTime)+3600:#unix time specification, assign to blockchain time
-                    addrs = produceaddr(line)
-                    for addr in addrs:
-                        f.write(addr + line)
-        i += 1
-    time.sleep(5)
     subprocess.Popen("del *.dat /q",shell=True)
     with open('proc.conf') as f:
         string = f.read()
@@ -105,9 +93,9 @@ while(True):
                 proc = lineX.split(",")
                 valA = re.sub('\W+',' ',proc[2])
                 valB = re.sub('\W+',' ',proc[3])
-                if valA < valB:
+                if valA <= valB:
                     statA+=1
-                if valA > valB:
+                if valA >= valB:
                     statB+=1
     #copyright - george wagenknecht - 2022 - all rights reserved
     time.sleep(5)
@@ -121,19 +109,6 @@ while(True):
             if segment.find("\'value\': ") > -1:
                 db.append(int(segment.split(":")[1]))
         return db
-    def getValuesOverX(seg):
-        lines = seg.split(",")
-        i = 0
-        for line in lines:
-            if line.find("\'value\': ") > -1:
-                array = produce(line)
-                for segment in array:
-                    if int(segment) > int(btcA):#btc amount
-                        i+=1
-        return str(i)
-    i = 0
-    with open("bitcoin_contempory_addr_associate.btc", encoding='UTF-8') as f:#e.g "bitcoin_contempory_addr_associate_4920994.dat"
-        procX = f.readlines()
     with open("proc.conf", encoding='UTF-8') as f:
         lines = f.readlines()
         var = ""
@@ -141,13 +116,11 @@ while(True):
             if line.find("totalBTC") > -1:
                 var = (line[16:len(line)-3])
                 break
-    for proc in procX:
-        f = open("test.csv", "a", encoding="utf8")
-        if statA > statB:
-            f.write(str(unixTime) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
-        if statA < statB:
-            f.write(str(unixTime) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
-        i+=1
+    f = open("test.csv", "a", encoding="utf8")
+    if statA > statB:
+        f.write(str(unixTime) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
+    if statA < statB:
+        f.write(str(unixTime) +"," + str(round(float(var))) + ",1\n")#todo, add more variables
     os.system('CLS')
     print("Training data constructed")
     xx+=1
