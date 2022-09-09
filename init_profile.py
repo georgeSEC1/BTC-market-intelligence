@@ -56,7 +56,7 @@ while(True):
     unixTime = int(time.time())
     os.system('CLS')
     print("Begin round", str(xx))
-    time.sleep(5)
+    time.sleep(1)
     subprocess.Popen("del *.btc /q",shell=True)
     with open("previous_transactions_detail.csv", encoding='UTF-8') as f:
         lines = f.readlines()
@@ -66,7 +66,7 @@ while(True):
     subprocess.Popen("curl -s \"https://poloniex.com/public?command=return24hVolume\" -o proc.conf")
     i = 0
     instance = str(random.randint(0,10000000))
-    time.sleep(5)
+    time.sleep(1)
     os.system('CLS')
     subprocess.Popen("del *.dat /q",shell=True)
     with open('proc.conf') as f:
@@ -77,14 +77,15 @@ while(True):
             os.system('CLS')
             print ("Loading" ,proc)
             subprocess.Popen("curl -s \"https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_15\" -o " + proc + "_" + instance +".dat")
-    time.sleep(5)
+    time.sleep(1)
     subprocess.Popen("dir /b *.dat > market.conf",shell=True)
-    time.sleep(5)
+    time.sleep(1)
     with open('market.conf') as f:
         lines = f.readlines()
     statA = 0
     statB = 0
     os.system('CLS')
+    varX = 0
     print("Analysing market movement")
     for line in lines:
         with open(line.strip()) as f:
@@ -95,10 +96,13 @@ while(True):
                 valB = re.sub('\W+',' ',proc[3])
                 if valA <= valB:
                     statA+=1
+                    varX += int(valB)
                 if valA >= valB:
                     statB+=1
+                    varX += int(valA)
+    varX=varX/len(lines)
     #copyright - george wagenknecht - 2022 - all rights reserved
-    time.sleep(5)
+    time.sleep(1)
     btcA = 10000#input("BTC above amount(e.g 100000): ")
     def produce(string):
         array = string.split(",")
@@ -118,9 +122,9 @@ while(True):
                 break
     f = open("test.csv", "a", encoding="utf8")
     if statA > statB:
-        f.write(str(unixTime) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
+        f.write(str(unixTime) +"," + str(varX) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
     if statA < statB:
-        f.write(str(unixTime) +"," + str(round(float(var))) + ",1\n")#todo, add more variables
+        f.write(str(unixTime) +"," + str(varX) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
     os.system('CLS')
     print("Training data constructed")
     xx+=1
