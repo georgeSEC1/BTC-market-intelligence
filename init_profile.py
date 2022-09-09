@@ -50,9 +50,10 @@ if option == "y":
                 print("Retrieving address transactions:",i,"/",len(lines))# monitor transactions for stock movements
         i+=1
 time.sleep(5)
-unixB = int(time.time())-86400#1 day ago
+
 xx = 1
 while(True):
+    unixTime = int(time.time())
     os.system('CLS')
     print("Begin round", str(xx))
     time.sleep(5)
@@ -73,7 +74,7 @@ while(True):
         if line.find("\'block_time\': ") > -1:
             array = produce(line)
             for segment in array:
-                if int(segment) > int(unixB) and int(segment) < int(unixB)+3600:#unix time specification, assign to blockchain time
+                if int(segment) > int(unixTime) and int(segment) < int(unixTime)+3600:#unix time specification, assign to blockchain time
                     addrs = produceaddr(line)
                     for addr in addrs:
                         f.write(addr + line)
@@ -143,16 +144,11 @@ while(True):
     for proc in procX:
         f = open("test.csv", "a", encoding="utf8")
         if statA > statB:
-            f.write(str(unixB) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
+            f.write(str(unixTime) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
         if statA < statB:
-            f.write(str(unixB) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
+            f.write(str(unixTime) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
         i+=1
     os.system('CLS')
     print("Training data constructed")
-    unixB += 3600 
     xx+=1
     time.sleep(1)
-    if unixB >= int(time.time()):
-        break
-print("Done")
-time.sleep(1)
