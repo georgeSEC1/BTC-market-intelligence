@@ -28,9 +28,5 @@ if option == "p":
     # make class predictions with the model
     predictions = (model.predict(X) > 0.5).astype(int)
     # summarize the first 5 cases
-    datasetB = loadtxt('realtime.csv', delimiter=',')
-    # split into input (X) and output (y) variables
-    X = dataset[:,0:4]
-    yB = datasetB[:,3]
     for i in range(len(dataset)):
         print('%s => %d ' % (X[i].tolist(), predictions[i]))

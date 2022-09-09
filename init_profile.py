@@ -73,7 +73,7 @@ while(True):
         if line.find("\'block_time\': ") > -1:
             array = produce(line)
             for segment in array:
-                if int(segment) > int(unixB) and int(segment) < int(unixB)+86400:#unix time specification, assign to blockchain time
+                if int(segment) > int(unixB) and int(segment) < int(unixB)+3600:#unix time specification, assign to blockchain time
                     addrs = produceaddr(line)
                     for addr in addrs:
                         f.write(addr + line)
@@ -143,9 +143,9 @@ while(True):
     for proc in procX:
         f = open("test.csv", "a", encoding="utf8")
         if statA > statB:
-            f.write(str(int(time.time())) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
+            f.write(str(unixB) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
         if statA < statB:
-            f.write(str(int(time.time())) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
+            f.write(str(unixB) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
         i+=1
     os.system('CLS')
     print("Training data constructed")
