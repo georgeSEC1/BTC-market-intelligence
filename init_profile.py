@@ -92,14 +92,14 @@ while(True):
             linesX = f.readlines()
             for lineX in linesX:
                 proc = lineX.split(",")
-                valA = re.sub('\W+',' ',proc[2])
-                valB = re.sub('\W+',' ',proc[3])
-                if valA <= valB:
+                valA = proc[2][2:-1]
+                valB = proc[3][2:-1]
+                if float(valA) <= float(valB):
                     statA+=1
-                    varX += int(valB)
-                if valA >= valB:
+                    varX += float(valB)
+                if float(valA) >= float(valB):
                     statB+=1
-                    varX += int(valA)
+                    varX += float(valA)
     varX=varX/len(lines)
     #copyright - george wagenknecht - 2022 - all rights reserved
     time.sleep(1)
@@ -122,9 +122,9 @@ while(True):
                 break
     f = open("test.csv", "a", encoding="utf8")
     if statA > statB:
-        f.write(str(unixTime) +"," + str(varX) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
+        f.write(str(unixTime) +"," + str(round(varX)) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
     if statA < statB:
-        f.write(str(unixTime) +"," + str(varX) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
+        f.write(str(unixTime) +"," + str(round(varX)) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
     os.system('CLS')
     print("Training data constructed")
     xx+=1
