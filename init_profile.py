@@ -50,7 +50,7 @@ if option == "y":
                 print("Retrieving address transactions:",i,"/",len(lines))# monitor transactions for stock movements
         i+=1
 time.sleep(5)
-unixB = int(time.time())-2629743#1 month ago
+unixB = int(time.time())-86400#1 day ago
 xx = 1
 while(True):
     os.system('CLS')
@@ -87,7 +87,7 @@ while(True):
             proc = line.split("\"")[1]
             os.system('CLS')
             print ("Loading" ,proc)
-            subprocess.Popen("curl -s \"https://api.poloniex.com/markets/"+proc+"/candles?interval=HOUR_1\"?&startTime="+str(unixB) +"&endTime="+ str(unixB + 86400) + " -o " + proc + "_" + instance +".dat")
+            subprocess.Popen("curl -s \"https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1\" -o " + proc + "_" + instance +".dat")
     time.sleep(5)
     subprocess.Popen("dir /b *.dat > market.conf",shell=True)
     time.sleep(5)
@@ -142,14 +142,14 @@ while(True):
                 break
     for proc in procX:
         f = open("test.csv", "a", encoding="utf8")
-        if statA >= statB:
+        if statA > statB:
             f.write(str(int(time.time())) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
-        if statA <= statB:
+        if statA < statB:
             f.write(str(int(time.time())) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
         i+=1
     os.system('CLS')
     print("Training data constructed")
-    unixB += 86400
+    unixB += 3600 
     xx+=1
     time.sleep(1)
     if unixB >= int(time.time()):
