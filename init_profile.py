@@ -143,13 +143,16 @@ while(True):
     for proc in procX:
         f = open("test.csv", "a", encoding="utf8")
         if statA >= statB:
-            f.write(str(int(time.time())) +"," + var +","+ getValuesOverX(proc) + ",0\n")
+            f.write(str(int(time.time())) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",0\n")
         if statA <= statB:
-            f.write(str(int(time.time())) +"," + var +","+ getValuesOverX(proc) + ",1\n")
+            f.write(str(int(time.time())) +"," + str(round(float(var))) +","+ getValuesOverX(proc) + ",1\n")
         i+=1
     os.system('CLS')
     print("Training data constructed")
     unixB += 86400
     xx+=1
     time.sleep(1)
-
+    if unixB >= int(time.time()):
+        break
+print("Done")
+time.sleep(1)
