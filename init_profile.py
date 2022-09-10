@@ -116,6 +116,7 @@ while(True):
     #copyright - george wagenknecht - 2022 - all rights reserved
     time.sleep(loadTime)
     os.system('CLS')
+    xxx.close()
     print("Training data constructed")
     xx+=1
     time.sleep(loadTime)
