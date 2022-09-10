@@ -6,8 +6,6 @@ import random
 import time
 import subprocess
 var = 1
-subprocess.Popen("del realtime.csv /q",shell=True)
-time.sleep(1)
 while(True):
     option = input("train or predict?[t/p]:")
     if option == "t":
@@ -22,20 +20,28 @@ while(True):
         model.fit(X, y, epochs=150, batch_size=10, verbose=1)
         model.save('my_model')
     if option == "p":
-        while(True):
-            xxx = open("realtime.csv", "a", encoding="utf8")
-            print()
-            inp = input("Enter candle length volume: ")
-            xxx.write(str(inp) + ",0\n")#todo, add more variables
-            xxx.write(str(inp) + ",0\n")#todo, add more variables
-            xxx.close()
-            time.sleep(1)
-            dataset = loadtxt('realtime.csv', delimiter=',')
-            X = dataset[:,0:var]
-            y = dataset[:,var]
-            model = keras.models.load_model('my_model')
-            predictions = (model.predict(X) > 0.5).astype(int)
-            i = 0
-            while(i < len(dataset)):
-                print('%s => %d' % (X[i].tolist(), predictions[i]))
-                i+=2
+        subprocess.Popen("del realtime.csv /q",shell=True)
+        time.sleep(1)
+        xxx = open("realtime.csv", "a", encoding="utf8")
+        print()
+        xxx.write("10000,0\n")#todo, add more variables
+        xxx.write("1000,0\n")#todo, add more variables
+        xxx.write("100,0\n")#todo, add more variables
+        xxx.write("10,0\n")#todo, add more variables
+        xxx.write("1,0\n")#todo, add more variables
+        xxx.write("0.1,0\n")#todo, add more variables
+        xxx.write("0.01,0\n")#todo, add more variables
+        xxx.write("0.001,0\n")#todo, add more variables
+        xxx.write("0.0001,0\n")#todo, add more variables
+        xxx.close()
+        time.sleep(1)
+        dataset = loadtxt('realtime.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = keras.models.load_model('my_model')
+        predictions = (model.predict(X) > 0.5).astype(int)
+        i = 0
+        print ("candle volume category & movement indicator:")
+        while(i < len(dataset)):
+            print('%s => %d' % (X[i].tolist(), predictions[i]))
+            i+=1
