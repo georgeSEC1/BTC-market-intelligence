@@ -7,7 +7,7 @@ import time
 import subprocess
 var = 1
 while(True):
-    option = input("train or predict?[t/p]:")
+    option = input("Train or predict?[t/p]:")
     if option == "t":
         dataset = loadtxt('test.csv', delimiter=',')
         X = dataset[:,0:var]
