@@ -105,7 +105,6 @@ while(True):
         xxx = open("test.csv", "a", encoding="utf8")
     if option == "y":
         xxx = open("realtime.csv", "a", encoding="utf8")
-        xxx.write(str(float(valB)) + ",1\n")#todo, add more variables
     for line in lines:
         with open(line.strip()) as f:
             linesX = f.readlines()
