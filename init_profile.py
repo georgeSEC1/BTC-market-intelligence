@@ -8,7 +8,6 @@ import re
 import pandas
 import os
 loadTime = 5
-option = input("prepare for realtime(work in progress, needs catagorical pair approach...)?[y/n]:")
 def produce(string):
     array = string.split(",")
     i = 0
@@ -101,10 +100,7 @@ while(True):
     statB = 0
     os.system('CLS')
     print("Analysing market movement")
-    if option == "n":
-        xxx = open("test.csv", "a", encoding="utf8")
-    if option == "y":
-        xxx = open("realtime.csv", "a", encoding="utf8")
+    xxx = open("test.csv", "a", encoding="utf8")
     for line in lines:
         with open(line.strip()) as f:
             linesX = f.readlines()

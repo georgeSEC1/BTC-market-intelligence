@@ -26,6 +26,7 @@ if option == "t":
 if option == "p":
     while(True):
         xxx = open("realtime.csv", "a", encoding="utf8")
+        print()
         inp = input("Enter candle length volume: ")
         xxx.write(str(inp) + ",0\n")#todo, add more variables
         xxx.write(str(inp) + ",0\n")#todo, add more variables
