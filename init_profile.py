@@ -7,6 +7,7 @@ import time
 import re
 import pandas
 import os
+option = input("prepare for realtime?[y/n]:")
 def produce(string):
     array = string.split(",")
     i = 0
@@ -28,8 +29,9 @@ def produceaddr(string):
             break
     return db
 os.system('CLS')
-option = input("Preprocess valuable addresses?[y/n]: ")
-if option == "y":
+optionB = ""
+#optionB = input("Preprocess valuable addresses?[y/n]: ")
+if optionB == "y":
     with open("blockchair_bitcoin_addresses_and_balance_LATEST.tsv", encoding='UTF-8') as f:
             lines = f.readlines()
     i = 0
@@ -50,7 +52,6 @@ if option == "y":
                 print("Retrieving address transactions:",i,"/",len(lines))# monitor transactions for stock movements
         i+=1
 time.sleep(5)
-
 xx = 1
 while(True):
     unixTime = int(time.time())
@@ -103,7 +104,10 @@ while(True):
     statB = 0
     os.system('CLS')
     print("Analysing market movement")
-    xxx = open("test.csv", "a", encoding="utf8")
+    if option == "n":
+        xxx = open("test.csv", "a", encoding="utf8")
+    if option == "y":
+        xxx = open("realtime.csv", "a", encoding="utf8")
     for line in lines:
         with open(line.strip()) as f:
             linesX = f.readlines()
@@ -112,9 +116,9 @@ while(True):
                 valA = proc[2][2:-1]
                 valB = proc[3][2:-1]
                 if float(valA) < float(valB):
-                    xxx.write(str(float(valB)) +"," + str(round(float(var))) + ",1\n")#todo, add more variables
+                    xxx.write(str(float(valB)) + ",1\n")#todo, add more variables
                 if float(valA) > float(valB):
-                    xxx.write(str(float(valA)) +"," +  str(round(float(var))) + ",0\n")#todo, add more variables
+                    xxx.write(str(float(valA)) + ",0\n")#todo, add more variables
     #copyright - george wagenknecht - 2022 - all rights reserved
     time.sleep(1)
     os.system('CLS')
