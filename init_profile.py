@@ -51,6 +51,7 @@ if optionB == "y":
                 os.system('CLS')
                 print("Retrieving address transactions:",i,"/",len(lines))# monitor transactions for stock movements
         i+=1
+subprocess.Popen("del *.csv /q",shell=True)
 time.sleep(loadTime)
 xx = 1
 while(True):
