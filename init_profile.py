@@ -58,10 +58,6 @@ while(True):
     os.system('CLS')
     print("Begin round", str(xx))
     time.sleep(1)
-    subprocess.Popen("del *.btc /q",shell=True)
-    with open("previous_transactions_detail.csv", encoding='UTF-8') as f:
-        lines = f.readlines()
-    time.sleep(1)
     os.system('CLS')
     print("Preparing profile")
     subprocess.Popen("curl -s \"https://poloniex.com/public?command=return24hVolume\" -o proc.conf")
@@ -108,6 +104,7 @@ while(True):
         xxx = open("test.csv", "a", encoding="utf8")
     if option == "y":
         xxx = open("realtime.csv", "a", encoding="utf8")
+        xxx.write(str(float(valB)) + ",1\n")#todo, add more variables
     for line in lines:
         with open(line.strip()) as f:
             linesX = f.readlines()
