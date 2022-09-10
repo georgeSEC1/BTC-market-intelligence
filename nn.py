@@ -7,6 +7,7 @@ import random
 import time
 # load the dataset
 var = 1
+subprocess.Popen("del realtime.csv /q",shell=True)
 while(True):
     option = input("train or predict?[t/p]:")
     if option == "t":
