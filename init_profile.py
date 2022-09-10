@@ -112,9 +112,9 @@ while(True):
                 valA = proc[2][2:-1]
                 valB = proc[3][2:-1]
                 if float(valA) < float(valB):
-                    xxx.write(str(unixTime) +"," + str(round(float(valB))) +"," + str(round(float(var))) + ",1\n")#todo, add more variables
+                    xxx.write(str(unixTime) +"," + str(float(valB)) +"," + str(round(float(var))) + ",1\n")#todo, add more variables
                 if float(valA) > float(valB):
-                    xxx.write(str(unixTime) +"," + str(round(float(valA))) +"," +  str(round(float(var))) + ",0\n")#todo, add more variables
+                    xxx.write(str(unixTime) +"," + str(float(valA)) +"," +  str(round(float(var))) + ",0\n")#todo, add more variables
     #copyright - george wagenknecht - 2022 - all rights reserved
     time.sleep(1)
     os.system('CLS')
