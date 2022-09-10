@@ -7,6 +7,7 @@ import time
 import subprocess
 var = 1
 subprocess.Popen("del realtime.csv /q",shell=True)
+time.sleep(1)
 while(True):
     option = input("train or predict?[t/p]:")
     if option == "t":
