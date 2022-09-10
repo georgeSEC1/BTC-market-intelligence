@@ -76,7 +76,7 @@ while(True):
             proc = line.split("\"")[1]
             os.system('CLS')
             print ("Loading" ,proc)
-            subprocess.Popen("curl -s \"https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_15\" -o " + proc + "_" + instance +".dat")
+            subprocess.Popen("curl -s \"https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_5\" -o " + proc + "_" + instance +".dat")
     time.sleep(1)
     subprocess.Popen("dir /b *.dat > market.conf",shell=True)
     time.sleep(1)
