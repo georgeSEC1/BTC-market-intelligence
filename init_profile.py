@@ -112,11 +112,11 @@ while(True):
                 proc = lineX.split(",")
                 valA = proc[2][2:-1]
                 valB = proc[3][2:-1]
-                if float(valA) <= float(valB):
+                if float(valA) < float(valB):
                     xxx.write(str(unixTime) +"," + str(round(varX)) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
                     statA+=1
                     varX += float(valB)
-                if float(valA) >= float(valB):
+                if float(valA) > float(valB):
                     xxx.write(str(unixTime) +"," + str(round(varX)) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
                     statB+=1
                     varX += float(valA)
