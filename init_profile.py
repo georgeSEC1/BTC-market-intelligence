@@ -7,6 +7,7 @@ import time
 import re
 import pandas
 import os
+loadTime = 5
 option = input("prepare for realtime?[y/n]:")
 def produce(string):
     array = string.split(",")
@@ -51,19 +52,19 @@ if optionB == "y":
                 os.system('CLS')
                 print("Retrieving address transactions:",i,"/",len(lines))# monitor transactions for stock movements
         i+=1
-time.sleep(5)
+time.sleep(loadTime)
 xx = 1
 while(True):
     unixTime = int(time.time())
     os.system('CLS')
     print("Begin round", str(xx))
-    time.sleep(1)
+    time.sleep(loadTime)
     os.system('CLS')
     print("Preparing profile")
     subprocess.Popen("curl -s \"https://poloniex.com/public?command=return24hVolume\" -o proc.conf")
     i = 0
     instance = str(random.randint(0,10000000))
-    time.sleep(1)
+    time.sleep(loadTime)
     os.system('CLS')
     subprocess.Popen("del *.dat /q",shell=True)
     with open('proc.conf') as f:
@@ -74,9 +75,9 @@ while(True):
             os.system('CLS')
             print ("Loading" ,proc)
             subprocess.Popen("curl -s \"https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_5\" -o " + proc + "_" + instance +".dat")
-    time.sleep(1)
+    time.sleep(loadTime)
     subprocess.Popen("dir /b *.dat > market.conf",shell=True)
-    time.sleep(1)
+    time.sleep(loadTime)
     btcA = 10000#input("BTC above amount(e.g 100000): ")
     def produce(string):
         array = string.split(",")
@@ -117,8 +118,8 @@ while(True):
                 if float(valA) > float(valB):
                     xxx.write(str(float(valA)) + ",0\n")#todo, add more variables
     #copyright - george wagenknecht - 2022 - all rights reserved
-    time.sleep(1)
+    time.sleep(loadTime)
     os.system('CLS')
     print("Training data constructed")
     xx+=1
-    time.sleep(1)
+    time.sleep(loadTime)
