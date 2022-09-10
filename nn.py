@@ -26,8 +26,9 @@ if option == "p":
     dataset = loadtxt('realtime.csv', delimiter=',')
     # split into input (X) and output (y) variables
     X = dataset[:,0:var]
+    y = dataset[:,var]
     model = keras.models.load_model('my_model')
     # make class predictions with the model
     predictions = (model.predict(X) > 0.5).astype(int)# summarize the first 5 cases
     for i in range(len(dataset)):
-        print('%s => %d ' % (X[i].tolist(), predictions[i]))
+        print('%s => %d (expected %d)' % (X[i].tolist(), predictions[i], y[i]))
