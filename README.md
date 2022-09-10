@@ -5,5 +5,5 @@ The btc market intelligence app tells you when coins rise and fall based on trad
 (automatic training data generation via curl)
 (trainer and predicton neural network)
 
-#Instructions for useage:
+#Instructions for usage:
 Run init_profile.py, wait a few rounds. run trendmaster.py, train the neural network then make predictions, init_profile.py can be run in the background for consecutive training and prediction runs.
