@@ -8,7 +8,7 @@ import re
 import pandas
 import os
 loadTime = 5
-option = input("prepare for realtime?[y/n]:")
+option = input("prepare for realtime(work in progress, needs catagorical pair approach...)?[y/n]:")
 def produce(string):
     array = string.split(",")
     i = 0

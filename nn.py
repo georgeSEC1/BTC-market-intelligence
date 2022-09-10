@@ -4,6 +4,7 @@ import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 import random
+import time
 # load the dataset
 var = 1
 option = input("train or predict?[t/p]:")
@@ -23,12 +24,21 @@ if option == "t":
     model.fit(X, y, epochs=250, batch_size=10, verbose=1)
     model.save('my_model')
 if option == "p":
-    dataset = loadtxt('realtime.csv', delimiter=',')
-    # split into input (X) and output (y) variables
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    model = keras.models.load_model('my_model')
-    # make class predictions with the model
-    predictions = (model.predict(X) > 0.5).astype(int)# summarize the first 5 cases
-    for i in range(len(dataset)):
-        print('%s => %d (expected %d)' % (X[i].tolist(), predictions[i], y[i]))
+    while(True):
+        xxx = open("realtime.csv", "a", encoding="utf8")
+        inp = input("Enter candle length volume: ")
+        xxx.write(str(inp) + ",0\n")#todo, add more variables
+        xxx.write(str(inp) + ",0\n")#todo, add more variables
+        xxx.close()
+        time.sleep(1)
+        dataset = loadtxt('realtime.csv', delimiter=',')
+        # split into input (X) and output (y) variables
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = keras.models.load_model('my_model')
+        # make class predictions with the model
+        predictions = (model.predict(X) > 0.5).astype(int)# summarize the first 5 cases
+        i = 0
+        while(i < len(dataset)):
+            print('%s => %d (expected %d)' % (X[i].tolist(), predictions[i], y[i]))
+            i+=2
