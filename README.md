@@ -1,4 +1,6 @@
 # BTC market intelligence
-download blockchair_bitcoin_addresses_and_balance_LATEST.tsv
+The btc market intelligence app tells you when coins rise and fall based on trading volume. the machine gives an indicator per volume group designated by the neural network. There are times when the trends are clear and times where they are not, the neural network will tell you this via it's accuracy level, higher accuracy levels are where trends are most present.
 
-(batch training data generation)
+(suited for poloniex)
+(automatic training data generation via curl)
+(trainer and predicton neural network)
