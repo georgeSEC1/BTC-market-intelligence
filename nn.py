@@ -41,5 +41,5 @@ if option == "p":
         predictions = (model.predict(X) > 0.5).astype(int)# summarize the first 5 cases
         i = 0
         while(i < len(dataset)):
-            print('%s => %d (expected %d)' % (X[i].tolist(), predictions[i], y[i]))
+            print('%s => %d' % (X[i].tolist(), predictions[i]))
             i+=2
