@@ -80,29 +80,6 @@ while(True):
     time.sleep(1)
     subprocess.Popen("dir /b *.dat > market.conf",shell=True)
     time.sleep(1)
-    with open('market.conf') as f:
-        lines = f.readlines()
-    statA = 0
-    statB = 0
-    os.system('CLS')
-    varX = 0
-    print("Analysing market movement")
-    for line in lines:
-        with open(line.strip()) as f:
-            linesX = f.readlines()
-            for lineX in linesX:
-                proc = lineX.split(",")
-                valA = proc[2][2:-1]
-                valB = proc[3][2:-1]
-                if float(valA) <= float(valB):
-                    statA+=1
-                    varX += float(valB)
-                if float(valA) >= float(valB):
-                    statB+=1
-                    varX += float(valA)
-    varX=varX/len(lines)
-    #copyright - george wagenknecht - 2022 - all rights reserved
-    time.sleep(1)
     btcA = 10000#input("BTC above amount(e.g 100000): ")
     def produce(string):
         array = string.split(",")
@@ -120,11 +97,31 @@ while(True):
             if line.find("totalBTC") > -1:
                 var = (line[16:len(line)-3])
                 break
-    f = open("test.csv", "a", encoding="utf8")
-    if statA > statB:
-        f.write(str(unixTime) +"," + str(round(varX)) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
-    if statA < statB:
-        f.write(str(unixTime) +"," + str(round(varX)) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
+    with open('market.conf') as f:
+        lines = f.readlines()
+    statA = 0
+    statB = 0
+    os.system('CLS')
+    varX = 0
+    print("Analysing market movement")
+    xxx = open("test.csv", "a", encoding="utf8")
+    for line in lines:
+        with open(line.strip()) as f:
+            linesX = f.readlines()
+            for lineX in linesX:
+                proc = lineX.split(",")
+                valA = proc[2][2:-1]
+                valB = proc[3][2:-1]
+                if float(valA) <= float(valB):
+                    xxx.write(str(unixTime) +"," + str(round(varX)) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
+                    statA+=1
+                    varX += float(valB)
+                if float(valA) >= float(valB):
+                    xxx.write(str(unixTime) +"," + str(round(varX)) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
+                    statB+=1
+                    varX += float(valA)
+    #copyright - george wagenknecht - 2022 - all rights reserved
+    time.sleep(1)
     os.system('CLS')
     print("Training data constructed")
     xx+=1
