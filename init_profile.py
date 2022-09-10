@@ -102,7 +102,6 @@ while(True):
     statA = 0
     statB = 0
     os.system('CLS')
-    varX = 0
     print("Analysing market movement")
     xxx = open("test.csv", "a", encoding="utf8")
     for line in lines:
@@ -113,13 +112,9 @@ while(True):
                 valA = proc[2][2:-1]
                 valB = proc[3][2:-1]
                 if float(valA) < float(valB):
-                    xxx.write(str(unixTime) +"," + str(round(varX)) +"," + str(round(float(var))) + ",0\n")#todo, add more variables
-                    statA+=1
-                    varX += float(valB)
+                    xxx.write(str(unixTime) +"," + str(round(float(valB))) +"," + str(round(float(var))) + ",1\n")#todo, add more variables
                 if float(valA) > float(valB):
-                    xxx.write(str(unixTime) +"," + str(round(varX)) +"," +  str(round(float(var))) + ",1\n")#todo, add more variables
-                    statB+=1
-                    varX += float(valA)
+                    xxx.write(str(unixTime) +"," + str(round(float(valA))) +"," +  str(round(float(var))) + ",0\n")#todo, add more variables
     #copyright - george wagenknecht - 2022 - all rights reserved
     time.sleep(1)
     os.system('CLS')
