@@ -6,6 +6,8 @@ import random
 import time
 import subprocess
 var = 1
+print("Trendmaster - 2022")
+print()
 while(True):
     option = input("Train or predict?[t/p]:")
     if option == "t":
