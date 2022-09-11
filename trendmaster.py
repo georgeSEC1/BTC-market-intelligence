@@ -73,7 +73,7 @@ while(True):
         model = keras.models.load_model('my_model')
         predictions = (model.predict(X) > 0.5).astype(int)
         i = 0
-        print ("Volume category & movement indicator:")
+        print ("Price category & movement indicator:")
         while(i < len(dataset)):
             print('%s => %d' % (X[i].tolist(), predictions[i]))
             i+=1
