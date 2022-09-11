@@ -29,7 +29,7 @@ def download_resource(url):
         return html.status_code
     except requests.exceptions.RequestException as e:
        return e
-waitTime = input("prediction pace in seconds(default 60): ")
+waitTime = input("Prediction pace in seconds(default 60): ")
 while(True):
     xx = 1
     while(xx <= tRounds):
