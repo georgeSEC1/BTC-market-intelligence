@@ -24,7 +24,6 @@ while(True):
         time.sleep(1)
         xxx = open("realtime.csv", "a", encoding="utf8")
         print()
-        xxx.write("10000,0\n")#todo, add more variables
         xxx.write("1000,0\n")#todo, add more variables
         xxx.write("100,0\n")#todo, add more variables
         xxx.write("10,0\n")#todo, add more variables
