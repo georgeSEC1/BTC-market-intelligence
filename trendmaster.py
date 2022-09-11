@@ -64,16 +64,6 @@ while(True):
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         model.fit(X, y, epochs=150, batch_size=10, verbose=0)
         model.save('my_model')
-        xxxx = open("realtime.csv", "w", encoding="utf8")
-        xxxx.write("1000,0\n")#todo, add more variables
-        xxxx.write("100,0\n")#todo, add more variables
-        xxxx.write("10,0\n")#todo, add more variables
-        xxxx.write("1,0\n")#todo, add more variables
-        xxxx.write("0.1,0\n")#todo, add more variables
-        xxxx.write("0.01,0\n")#todo, add more variables
-        xxxx.write("0.001,0\n")#todo, add more variables
-        xxxx.write("0.0001,0\n")#todo, add more variables
-        xxxx.close()
         time.sleep(1)
         dataset = loadtxt('test.csv', delimiter=',')
         X = dataset[:,0:var]
