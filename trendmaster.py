@@ -10,7 +10,7 @@ import time
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-var = 1
+var = 8
 tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
@@ -20,12 +20,19 @@ def download_resource(url):
         rx = requests.get(url)
         array = json.loads(rx.content.decode('utf-8'))
         for item in array:
+            val1 = item[0]
+            val2 = item[1]
             valA = item[2]
             valB = item[3]
+            val3 = item[4]
+            val4 = item[5]
+            val5 = item[6]
+            val6 = item[7]
+            val7 = item[8]
             if float(valA) < float(valB):
-                xxx.write(str(float(valB)) + ",1\n")#todo, add more variables
+                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valB))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
             if float(valA) > float(valB):
-                xxx.write(str(float(valA)) + ",0\n")#todo, add more variables
+                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
             xxx.flush()
         return html.status_code
     except requests.exceptions.RequestException as e:
@@ -68,7 +75,7 @@ while(True):
         xxxx.write("0.0001,0\n")#todo, add more variables
         xxxx.close()
         time.sleep(1)
-        dataset = loadtxt('realtime.csv', delimiter=',')
+        dataset = loadtxt('test.csv', delimiter=',')
         X = dataset[:,0:var]
         y = dataset[:,var]
         model = keras.models.load_model('my_model')
