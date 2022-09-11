@@ -10,7 +10,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 var = 1
-tRounds = 10
+tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
 xxx = open("test.csv", "w", encoding="utf8")
