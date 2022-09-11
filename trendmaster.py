@@ -8,10 +8,11 @@ import tensorflow as tf
 from numpy import loadtxt
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-xx = 1
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 var = 1
+tRounds = 10
+waitTime = 60
 print("Trendmaster - 2022")
-print()
 xxx = open("test.csv", "w", encoding="utf8")
 def download_resource(url):
     try:
@@ -28,49 +29,56 @@ def download_resource(url):
         return html.status_code
     except requests.exceptions.RequestException as e:
        return e
+waitTime = input("prediction pace in seconds(default 60): ")
 while(True):
-    print("Round", str(xx))
-    url_list = []
-    r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
-    string = r.text
-    for line in string.split(","):
-        if line.find("_") > -1 and line.find("BTC") > -1:     
-            proc = line.split("\"")[1]
-            url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
-    threads = []
-    with ThreadPoolExecutor(max_workers=200) as executor:
-        for url in url_list:
-            threads.append(executor.submit(download_resource, url))
-    dataset = loadtxt('test.csv', delimiter=',')
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    model = Sequential()
-    model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
-    model.add(Dense(50, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X, y, epochs=150, batch_size=10, verbose=0)
-    model.save('my_model')
-    xxx = open("realtime.csv", "w", encoding="utf8")
+    xx = 1
+    while(xx <= tRounds):
+        print()
+        print("Round", str(xx))
+        url_list = []
+        r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
+        string = r.text
+        for line in string.split(","):
+            if line.find("_") > -1 and line.find("BTC") > -1:     
+                proc = line.split("\"")[1]
+                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
+        threads = []
+        with ThreadPoolExecutor(max_workers=200) as executor:
+            for url in url_list:
+                threads.append(executor.submit(download_resource, url))
+        dataset = loadtxt('test.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = Sequential()
+        model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
+        model.add(Dense(50, activation='relu'))
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.fit(X, y, epochs=150, batch_size=10, verbose=0)
+        model.save('my_model')
+        xxx = open("realtime.csv", "w", encoding="utf8")
+        xxx.write("1000,0\n")#todo, add more variables
+        xxx.write("100,0\n")#todo, add more variables
+        xxx.write("10,0\n")#todo, add more variables
+        xxx.write("1,0\n")#todo, add more variables
+        xxx.write("0.1,0\n")#todo, add more variables
+        xxx.write("0.01,0\n")#todo, add more variables
+        xxx.write("0.001,0\n")#todo, add more variables
+        xxx.write("0.0001,0\n")#todo, add more variables
+        xxx.close()
+        time.sleep(1)
+        dataset = loadtxt('realtime.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = keras.models.load_model('my_model')
+        predictions = (model.predict(X) > 0.5).astype(int)
+        i = 0
+        print ("Volume category & movement indicator:")
+        while(i < len(dataset)):
+            print('%s => %d' % (X[i].tolist(), predictions[i]))
+            i+=1
+        xx+=1
+        print("Waiting for", str(waitTime), "seconds...")
+        time.sleep(int(waitTime))
     print()
-    xxx.write("1000,0\n")#todo, add more variables
-    xxx.write("100,0\n")#todo, add more variables
-    xxx.write("10,0\n")#todo, add more variables
-    xxx.write("1,0\n")#todo, add more variables
-    xxx.write("0.1,0\n")#todo, add more variables
-    xxx.write("0.01,0\n")#todo, add more variables
-    xxx.write("0.001,0\n")#todo, add more variables
-    xxx.write("0.0001,0\n")#todo, add more variables
-    xxx.close()
-    time.sleep(1)
-    dataset = loadtxt('realtime.csv', delimiter=',')
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    model = keras.models.load_model('my_model')
-    predictions = (model.predict(X) > 0.5).astype(int)
-    i = 0
-    print ("Volume category & movement indicator:")
-    while(i < len(dataset)):
-        print('%s => %d' % (X[i].tolist(), predictions[i]))
-        i+=1
-    xx+=1
+    print("Refreshing...")
