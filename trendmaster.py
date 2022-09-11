@@ -41,7 +41,7 @@ waitTime = input("Prediction pace in seconds(default 60): ")
 while(True):
     xx = 1
     while(xx <= tRounds):
-        print()
+        os.system('cls')
         print("Round", str(xx))
         url_list = []
         r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
@@ -65,6 +65,15 @@ while(True):
         model.fit(X, y, epochs=150, batch_size=10, verbose=0)
         model.save('my_model')
         time.sleep(1)
+        filename = ("test.csv")
+        file_handle = open(filename, "r")
+        words = []
+        for line in file_handle:
+            words += line.split("\n")
+        file_handle.close()
+        xxx = open("test.csv", "w", encoding="utf8")
+        xxx.write("\n".join(sorted(words)))
+        xxx.close()
         dataset = loadtxt('test.csv', delimiter=',')
         X = dataset[:,0:var]
         y = dataset[:,var]
