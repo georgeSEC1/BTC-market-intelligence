@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Dense
 import tensorflow as tf
 from numpy import loadtxt
 import time
+import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 var = 1
@@ -16,16 +17,16 @@ print("Trendmaster - 2022")
 xxx = open("test.csv", "w", encoding="utf8")
 def download_resource(url):
     try:
-        html = requests.get(url, stream=True)
         rx = requests.get(url)
-        proc = rx.text.split(",")
-        valA = proc[2][2:-1]
-        valB = proc[3][2:-1]
-        if float(valA) < float(valB):
-            xxx.write(str(float(valB)) + ",1\n")#todo, add more variables
-        if float(valA) > float(valB):
-            xxx.write(str(float(valA)) + ",0\n")#todo, add more variables
-        xxx.flush()
+        array = json.loads(rx.content.decode('utf-8'))
+        for item in array:
+            valA = item[2]
+            valB = item[3]
+            if float(valA) < float(valB):
+                xxx.write(str(float(valB)) + ",1\n")#todo, add more variables
+            if float(valA) > float(valB):
+                xxx.write(str(float(valA)) + ",0\n")#todo, add more variables
+            xxx.flush()
         return html.status_code
     except requests.exceptions.RequestException as e:
        return e
