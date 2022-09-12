@@ -53,6 +53,7 @@ def download_resource(url,mode):
     except requests.exceptions.RequestException as e:
        return e
 while(True):
+    print()
     print("Loading...")
     url_list = []
     r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
