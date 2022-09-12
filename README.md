@@ -1,6 +1,5 @@
 # Trendmaster
-The btc market intelligence app tells you when coins rise and fall based on trading volume. The machine gives an indicator per volume group designated by the neural network. 
-
+#No guarantee it works and does not generate expert financial advice....
 (suited for poloniex)
 (automatic training data generation)
 (trainer and predicton neural network)
