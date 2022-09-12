@@ -1,5 +1,5 @@
 # Trendmaster
-#No guarantee it works and does not generate expert financial advice....
+#No guarantee it works and does not generate expert financial advice...
 (suited for poloniex)
 (automatic training data generation)
 (trainer and predicton neural network)
