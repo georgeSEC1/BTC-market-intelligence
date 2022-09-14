@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
-#poloniex trading bot
+#Poloniex trading bot
 access_key = ""#enter API key
 secret_key = ""#enter API secret  
 import requests
