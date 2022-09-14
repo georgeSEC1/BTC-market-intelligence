@@ -83,6 +83,7 @@ tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
 xxx = open("test.csv", "w", encoding="utf8")
+TotalCheck = []
 totalPAIR = []
 def download_resource(proc,url,mode):
     try:
@@ -128,10 +129,10 @@ def download_resource(proc,url,mode):
         return rx.status_code
     except requests.exceptions.RequestException as e:
        return e
-headers = {"Content-Type": "application/json"}
-host = "https://api.poloniex.com"
-service = SDK(access_key, secret_key)
 while(True):
+    headers = {"Content-Type": "application/json"}
+    host = "https://api.poloniex.com"
+    service = SDK(access_key, secret_key)
     print()
     print("Loading...")
     url_list = []
@@ -148,7 +149,7 @@ while(True):
     with ThreadPoolExecutor(max_workers=200) as executor:
         i = 0
         for url in url_list:
-            if i < len(TotalCheck)-1:
+            if i < len(TotalCheck):
                 threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
             i+=1
     dataset = loadtxt('test.csv', delimiter=',')
@@ -173,45 +174,48 @@ while(True):
         i = 0
         print ("Price category & movement indicator for:", PAIR)
         print('%s => %d' % (X[0].tolist(), predictions[0]))
-        if predictions[0][0] == 0:#TODO: adjust values   
-            path_req = "/orders"    
-            method_req = "post"    
-            params_req = {
-                "symbol": PAIR,
-                "accountType": "spot",
-                "type": "limit",
-                "side": "sell",
-                "timeInForce": "GTC",
-                "price": "1000",
-                "amount": "1",
-                "quantity": "10",
-                "clientOrderId": "",
-            }
-            res = service.sign_req(
-                host,
-                path_req,
-                method_req,
-                params_req,
-                headers)
-            print(res)
-        if predictions[0][0] == 1:#TODO: adjust values       
-            path_req = "/orders"    
-            method_req = "post"    
-            params_req = {
-                "symbol": PAIR,
-                "accountType": "spot",
-                "type": "limit",
-                "side": "buy",
-                "timeInForce": "GTC",
-                "price": "1000",
-                "amount": "1",
-                "quantity": "10",
-                "clientOrderId": "",
-            }
-            res = service.sign_req(
-                host,
-                path_req,
-                method_req,
-                params_req,
-                headers)
-            print(res)
+        try:
+            if predictions[0][0] == 0:#TODO: adjust values   
+                path_req = "/orders"    
+                method_req = "post"    
+                params_req = {
+                    "symbol": PAIR,
+                    "accountType": "spot",
+                    "type": "limit",
+                    "side": "sell",
+                    "timeInForce": "GTC",
+                    "price": "1000",
+                    "amount": "1",
+                    "quantity": "10",
+                    "clientOrderId": "",
+                }
+                res = service.sign_req(
+                    host,
+                    path_req,
+                    method_req,
+                    params_req,
+                    headers)
+                print(res)
+            if predictions[0][0] == 1:#TODO: adjust values       
+                path_req = "/orders"    
+                method_req = "post"    
+                params_req = {
+                    "symbol": PAIR,
+                    "accountType": "spot",
+                    "type": "limit",
+                    "side": "buy",
+                    "timeInForce": "GTC",
+                    "price": "1000",
+                    "amount": "1",
+                    "quantity": "10",
+                    "clientOrderId": "",
+                }
+                res = service.sign_req(
+                    host,
+                    path_req,
+                    method_req,
+                    params_req,
+                    headers)
+                print(res)
+        except:
+            print("FAILED!")
