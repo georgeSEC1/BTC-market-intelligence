@@ -1,7 +1,10 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
-access_key = ""#enter API key
-secret_key = ""#enter API secret  
+access_key = "Y3KG6MET-IY5UX6P3-AL0HJMVI-DBG92NCQ"#enter API key
+secret_key = "bd8069542e1a2583d04052d8ade102b10eaf165f4655fda306406f8f301660a354b0754bd7a54e80e3b63108d42b0160cb682e3be069b6fca0b4d40635b0f478"#enter API secret
+modB = 0.009
+modS = 1.001
+taker = 3
 import requests
 import os
 import keras
@@ -173,10 +176,18 @@ while(True):
         print('%s => %d' % (X[0].tolist(), predictions[0]))
         varX = float(X[0][2])
         if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
-            if varX > 1:
-                varX*=1.0000001
             if varX < 1:
-                varX*=1.0000001
+                varZ = "%.8f" % varX
+                take = varZ.split('.')[1][-taker:]
+                i = 0
+                mag = "0."
+                while(i+len(str(take)) < 8):
+                    mag+="0"
+                    i+=1
+                varI = "%.8f" % (varX+float(mag+str(take)))
+            if varX > 1:
+                varI = varX*modS
+            print("SELL @",varI)
             path_req = "/orders"    
             method_req = "post"    
             params_req = {
@@ -185,7 +196,7 @@ while(True):
                 "type": "limit",
                 "side": "sell",
                 "timeInForce": "GTC",
-                "price": "%.8f" % varX,
+                "price": varI,
                 "amount": "1",
                 "quantity": "10",
                 "clientOrderId": "",
@@ -198,10 +209,18 @@ while(True):
                 headers)
             print(res)
         if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
-            if varX > 1:
-                varX*=0.0000009
             if varX < 1:
-                varX*=0.0000009
+                varZ = "%.8f" % varX
+                take = varZ.split('.')[1][-3:]
+                i = 0
+                mag = "0."
+                while(i+len(str(taker)) < 8):
+                    mag+="0"
+                    i+=1
+                varI = "%.8f" % (varX+float(mag+str(take)))
+            if varX > 1:
+                varI = varX*modB
+            print("BUY @",varI)
             path_req = "/orders"    
             method_req = "post"    
             params_req = {
@@ -210,7 +229,7 @@ while(True):
                 "type": "limit",
                 "side": "buy",
                 "timeInForce": "GTC",
-                "price": "%.8f" % varX,
+                "price": varI,
                 "amount": "1",
                 "quantity": "10",
                 "clientOrderId": "",
