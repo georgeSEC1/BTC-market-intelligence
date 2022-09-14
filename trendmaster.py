@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
+host = "https://sandbox-api.poloniex.com/"
 access_key = ""#enter API key
 secret_key = ""#enter API secret  
 import requests
@@ -82,10 +83,12 @@ tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
 xxx = open("test.csv", "w", encoding="utf8")
-def download_resource(url,mode):
+totalPAIR = []
+def download_resource(proc,url,mode):
     try:
         rx = requests.get(url)
         array = json.loads(rx.content.decode('utf-8'))
+        go = 1
         for item in array:
             val1 = item[0]
             val2 = item[1]
@@ -97,8 +100,14 @@ def download_resource(url,mode):
             val6 = item[7]
             val7 = item[8]
             if float(valA) < float(valB) and mode == 0:
+                if go == 1:
+                    totalPAIR.append(proc)
+                go = 0
                 xxx.write(str(val1) +","+ str(val2)  +","+str(float(valB))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
             if float(valA) > float(valB) and mode == 0:
+                if go == 1:
+                    totalPAIR.append(proc)
+                go = 0
                 xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
             xxx.flush()
             if float(valA) < float(valB) and mode == 1:
@@ -128,16 +137,20 @@ while(True):
     url_list = []
     r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
     string = r.text
-    totalPairs = ""
+    TotalCheck = []
+    totalPAIR = []
     for line in string.split(","):
         if line.find("_") > -1 and line.find("BTC") > -1:     
             proc = line.split("\"")[1]
             url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
-            totalPairs += proc + ", "
+            TotalCheck.append(proc)
     threads = []
     with ThreadPoolExecutor(max_workers=200) as executor:
+        i = 0
         for url in url_list:
-            threads.append(executor.submit(download_resource, url,0))
+            if i < len(TotalCheck)-1:
+                threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
+            i+=1
     dataset = loadtxt('test.csv', delimiter=',')
     X = dataset[:,0:var]
     y = dataset[:,var]
@@ -148,64 +161,57 @@ while(True):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X, y, epochs=150, batch_size=10, verbose=0)
     model.save('my_model')
-    print("Crypto pairs:",totalPairs)
-    url = "https://api.poloniex.com/markets/"+input("Enter crypto pair: ")+"/candles?interval=MINUTE_1"
-    download_resource(url,1)
-    dataset = loadtxt('realtime.csv', delimiter=',')
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    model = keras.models.load_model('my_model')
-    predictions = (model.predict(X) > 0.5).astype(int)
-    i = 0
-    print ("Price category & movement indicator:")
-    print('%s => %d' % (X[0].tolist(), predictions[0]))
-    #TODO, implement trading strategy
-    # Example1: get order        
-    path_req = "/orders/"    
-    method_req = "get"    
-    params_req = {"limit": 10}
-    res = service.sign_req(
-        host,
-        path_req,
-        method_req,
-        params_req,
-        headers)
-    print(res)
-
-    # Example2: place order        
-    path_req = "/orders"    
-    method_req = "post"    
-    params_req = {
-        "symbol": "link_usdt",
-        "accountType": "spot",
-        "type": "limit",
-        "side": "sell",
-        "timeInForce": "GTC",
-        "price": "1000",
-        "amount": "1",
-        "quantity": "10",
-        "clientOrderId": "",
-    }
-    res = service.sign_req(
-        host,
-        path_req,
-        method_req,
-        params_req,
-        headers)
-    print(res)
-
-    # Example3: cancel order        
-    path_req = "/orders/cancelByIds"    
-    method_req = "DELETE"    
-    params_req = {
-        "orderIds": ["29222978772373504"],
-        "clientOrderIds": []
-    }
-    res = service.sign_req(
-        host,
-        path_req,
-        method_req,
-        params_req,
-        headers)
-    print(res)
-    
+    print("Crypto pairs:",totalPAIR)
+    for PAIR in totalPAIR:
+        url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
+        download_resource(PAIR,url,1)
+        dataset = loadtxt('realtime.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = keras.models.load_model('my_model')
+        predictions = (model.predict(X) > 0.5).astype(int)
+        i = 0
+        print ("Price category & movement indicator for:", PAIR)
+        print('%s => %d' % (X[0].tolist(), predictions[0]))
+        if predictions[0][0] == 0:#TODO: adjust values   
+            path_req = "/orders"    
+            method_req = "post"    
+            params_req = {
+                "symbol": PAIR,
+                "accountType": "spot",
+                "type": "limit",
+                "side": "sell",
+                "timeInForce": "GTC",
+                "price": "1000",
+                "amount": "1",
+                "quantity": "10",
+                "clientOrderId": "",
+            }
+            res = service.sign_req(
+                host,
+                path_req,
+                method_req,
+                params_req,
+                headers)
+            print(res)
+        if predictions[0][0] == 1:#TODO: adjust values       
+            path_req = "/orders"    
+            method_req = "post"    
+            params_req = {
+                "symbol": PAIR,
+                "accountType": "spot",
+                "type": "limit",
+                "side": "buy",
+                "timeInForce": "GTC",
+                "price": "1000",
+                "amount": "1",
+                "quantity": "10",
+                "clientOrderId": "",
+            }
+            res = service.sign_req(
+                host,
+                path_req,
+                method_req,
+                params_req,
+                headers)
+            print(res)
