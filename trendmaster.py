@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
-host = "https://sandbox-api.poloniex.com/"
 access_key = ""#enter API key
 secret_key = ""#enter API secret  
 import requests
