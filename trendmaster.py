@@ -1,7 +1,7 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
-access_key = "Y3KG6MET-IY5UX6P3-AL0HJMVI-DBG92NCQ"#enter API key
-secret_key = "bd8069542e1a2583d04052d8ade102b10eaf165f4655fda306406f8f301660a354b0754bd7a54e80e3b63108d42b0160cb682e3be069b6fca0b4d40635b0f478"#enter API secret
+access_key = ""#enter API key
+secret_key = ""#enter API secret
 modB = 0.009
 modS = 1.001
 taker = 3
@@ -181,12 +181,13 @@ while(True):
                 take = varZ.split('.')[1][-taker:]
                 i = 0
                 mag = "0."
-                while(i+len(str(take)) < 8):
+                while(i+len(str(take)) < len(str(varX))-2):
                     mag+="0"
                     i+=1
                 varI = "%.8f" % (varX+float(mag+str(take)))
             if varX > 1:
                 varI = varX*modS
+                varI = "%.2f" % varI
             print("SELL @",varI)
             path_req = "/orders"    
             method_req = "post"    
@@ -214,12 +215,13 @@ while(True):
                 take = varZ.split('.')[1][-3:]
                 i = 0
                 mag = "0."
-                while(i+len(str(taker)) < 8):
+                while(i+len(str(taker)) < len(str(varX))-2):
                     mag+="0"
                     i+=1
                 varI = "%.8f" % (varX+float(mag+str(take)))
             if varX > 1:
-                varI = varX*modB
+                varI = varX*modS
+                varI = "%.2f" % varI
             print("BUY @",varI)
             path_req = "/orders"    
             method_req = "post"    
