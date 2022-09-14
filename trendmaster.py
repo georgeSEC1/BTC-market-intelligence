@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 access_key = ""#enter API key
@@ -170,51 +169,56 @@ while(True):
         y = dataset[:,var]
         model = keras.models.load_model('my_model')
         predictions = (model.predict(X) > 0.5).astype(int)
-        i = 0
         print ("Price category & movement indicator for:", PAIR)
         print('%s => %d' % (X[0].tolist(), predictions[0]))
-        try:
-            if predictions[0][0] == 0:#TODO: adjust values   
-                path_req = "/orders"    
-                method_req = "post"    
-                params_req = {
-                    "symbol": PAIR,
-                    "accountType": "spot",
-                    "type": "limit",
-                    "side": "sell",
-                    "timeInForce": "GTC",
-                    "price": "1000",
-                    "amount": "1",
-                    "quantity": "10",
-                    "clientOrderId": "",
-                }
-                res = service.sign_req(
-                    host,
-                    path_req,
-                    method_req,
-                    params_req,
-                    headers)
-                print(res)
-            if predictions[0][0] == 1:#TODO: adjust values       
-                path_req = "/orders"    
-                method_req = "post"    
-                params_req = {
-                    "symbol": PAIR,
-                    "accountType": "spot",
-                    "type": "limit",
-                    "side": "buy",
-                    "timeInForce": "GTC",
-                    "price": "1000",
-                    "amount": "1",
-                    "quantity": "10",
-                    "clientOrderId": "",
-                }
-                res = service.sign_req(
-                    host,
-                    path_req,
-                    method_req,
-                    params_req,
-                    headers)
-                print(res)
-        except:
-            print("FAILED!")
+        varX = float(X[0][2])
+        if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+            if varX > 1:
+                varX*=1.0000001
+            if varX < 1:
+                varX*=1.0000001
+            path_req = "/orders"    
+            method_req = "post"    
+            params_req = {
+                "symbol": PAIR,
+                "accountType": "spot",
+                "type": "limit",
+                "side": "sell",
+                "timeInForce": "GTC",
+                "price": float(f'{varX:.8f}'),
+                "amount": "1",
+                "quantity": "10",
+                "clientOrderId": "",
+            }
+            res = service.sign_req(
+                host,
+                path_req,
+                method_req,
+                params_req,
+                headers)
+            print(res)
+        if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+            if varX > 1:
+                varX*=0.0000009
+            if varX < 1:
+                varX*=0.0000009
+            path_req = "/orders"    
+            method_req = "post"    
+            params_req = {
+                "symbol": PAIR,
+                "accountType": "spot",
+                "type": "limit",
+                "side": "buy",
+                "timeInForce": "GTC",
+                "price": float(f'{varX:.8f}'),
+                "amount": "1",
+                "quantity": "10",
+                "clientOrderId": "",
+            }
+            res = service.sign_req(
+                host,
+                path_req,
+                method_req,
+                params_req,
+                headers)
+            print(res)
