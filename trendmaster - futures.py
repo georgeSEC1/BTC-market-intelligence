@@ -49,6 +49,7 @@ def download_resource(proc,url,mode):
             val5 = item[6]
             val6 = item[7]
             val7 = item[8]
+            #open/close is varA/varB
             if float(valA) < float(valB) and mode == 0:
                 if go == 1:
                     totalPAIR.append(proc)
@@ -58,7 +59,7 @@ def download_resource(proc,url,mode):
                 if go == 1:
                     totalPAIR.append(proc)
                 go = 0
-                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
+                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valB))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
             xxx.flush()
             if mode == 1:
                 xxxx = open("realtime.csv", "w", encoding="utf8")
