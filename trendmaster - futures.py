@@ -33,6 +33,8 @@ print("Trendmaster - 2022")
 xxx = open("test.csv", "w", encoding="utf8")
 TotalCheck = []
 totalPAIR = []
+recordPrev = 2
+stat = 0
 def download_resource(proc,url,mode):
     try:
         valY = trade.get_position_details("BTCUSDTPERP")['markPrice']
@@ -49,13 +51,15 @@ def download_resource(proc,url,mode):
             val5 = item[6]
             val6 = item[7]
             val7 = item[8]
-            #open/close is varA/varB
+            #open/close is valA/valB
             if float(valA) < float(valB) and mode == 0:
+                recordPrev = 1
                 if go == 1:
                     totalPAIR.append(proc)
                 go = 0
                 xxx.write(str(val1) +","+ str(val2)  +","+str(float(valB))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
             if float(valA) > float(valB) and mode == 0:
+                recordPrev = 0
                 if go == 1:
                     totalPAIR.append(proc)
                 go = 0
@@ -135,6 +139,7 @@ while(True):
         except:
             traceback.print_exc()
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+        testVar = 1
         if varX < 1:
             varZ = "%.8f" % varX
             take = varZ.split('.')[1][-3:]
@@ -155,4 +160,13 @@ while(True):
                 print("BUY @",varI)
         except:
             traceback.print_exc()
+    if recordPrev == predictions[0][0] and recordPrev != 2:
+        stat += 1
+        recordPrev = predictions[0][0]
+    if recordPrev != predictions[0][0] and recordPrev != 2:
+        stat -= 1
+        recordPrev = predictions[0][0]
+    if recordPrev == 2:
+        recordPrev = 0
+    print("Theoretical success balance(from 0):" , stat)
     
