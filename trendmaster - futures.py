@@ -4,7 +4,7 @@
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
-modB = 0.0009
+modB = 1.0001
 modS = 1.0001
 taker = 3
 import requests
@@ -30,9 +30,7 @@ var = 8
 tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
-xxx = open("test.csv", "w", encoding="utf8")
-TotalCheck = []
-totalPAIR = []
+
 recordPrev = 2
 stat = 0
 def download_resource(proc,url,mode):
@@ -74,6 +72,9 @@ def download_resource(proc,url,mode):
     except requests.exceptions.RequestException as e:
        return e
 while(True):
+    xxx = open("test.csv", "w", encoding="utf8")
+    TotalCheck = []
+    totalPAIR = []
     print()
     print("Loading...")
     url_list = []
@@ -107,7 +108,7 @@ while(True):
     time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
-    url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
+    url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MONTH_1"
     download_resource(PAIR,url,1)
     dataset = loadtxt('realtime.csv', delimiter=',')
     X = dataset[:,0:var]
@@ -134,7 +135,7 @@ while(True):
             print("Trendmaster could SELL @",varI)
         try:
             if varX > 1:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '5', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
         except:
             traceback.print_exc()
@@ -156,7 +157,7 @@ while(True):
             print("Trendmaster could BUY @",varI)
         try:
             if varX > 1:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '5', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("BUY @",varI)
         except:
             traceback.print_exc()
