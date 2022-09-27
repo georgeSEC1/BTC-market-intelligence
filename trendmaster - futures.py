@@ -4,8 +4,8 @@
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
-modB = 1.0001
-modS = 1.0001
+modB = 1.0011
+modS = 1.0011
 taker = 3
 import requests
 import os
@@ -135,7 +135,7 @@ while(True):
             print("Trendmaster could SELL @",varI)
         try:
             if varX > 1:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '5', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
         except:
             traceback.print_exc()
@@ -157,7 +157,7 @@ while(True):
             print("Trendmaster could BUY @",varI)
         try:
             if varX > 1:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '5', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("BUY @",varI)
         except:
             traceback.print_exc()
