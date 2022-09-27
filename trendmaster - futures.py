@@ -30,10 +30,7 @@ trade = rest_client.trade_api()
 market = rest_client.market_api()
 user = rest_client.user_api()
 var = 8
-tRounds = 5
-waitTime = 60
 print("Trendmaster - 2022")
-recordPrev = 2
 stat = 0
 index = 0
 def download_resource(proc,url,mode):
@@ -54,19 +51,17 @@ def download_resource(proc,url,mode):
             val7 = item[8]
             #open/close is valA/valB
             if float(valA) < float(valB) and mode == 0:
-                recordPrev = 1
                 if go == 1:
                     totalPAIR.append(proc)
                 go = 0
-                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valB))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
+                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
             if float(valA) > float(valB) and mode == 0:
-                recordPrev = 0
                 if go == 1:
                     totalPAIR.append(proc)
                 go = 0
-                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valB))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
+                xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
             xxx.flush()
-            if mode == 1:
+            if mode == 1 and url.find("BTC_USDT") > -1:
                 xxxx = open("realtime.csv", "w", encoding="utf8")
                 xxxx.write(str(val1) +","+ str(val2)  +","+str(float(valY))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
                 xxxx.write(str(val1) +","+ str(val2)  +","+str(float(valY))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
@@ -167,13 +162,3 @@ while(True):
                 print("BUY @",varI)
         except:
             traceback.print_exc()
-    if recordPrev == predictions[0][0] and recordPrev != 2:
-        stat += 1
-        recordPrev = predictions[0][0]
-    if recordPrev != predictions[0][0] and recordPrev != 2:
-        stat -= 1
-        recordPrev = predictions[0][0]
-    if recordPrev == 2:
-        recordPrev = 0
-    print("Theoretical success weight(from 0):" , stat)
-    
