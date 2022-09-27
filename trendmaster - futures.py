@@ -1,8 +1,8 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = "6322c494eedcca00073eb05a"
-SECRET = "9275fd55-0883-4ed8-b501-67197db39715"
+API_KEY = ""
+SECRET = ""
 API_PASS = input("Please enter account password: ")
 modB = 1.0001
 modS = 1.0001
