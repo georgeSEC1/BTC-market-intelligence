@@ -106,7 +106,7 @@ while(True):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X, y, epochs=150, batch_size=10, verbose=0)
     model.save('my_model')
-    cancel_all = trade.cancel_all_limit_orders(SYMBOL)
+    cancel_all = trade.cancel_all_limit_orders('BTCUSDTPERP')
     time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
