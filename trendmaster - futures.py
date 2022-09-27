@@ -86,7 +86,7 @@ while(True):
             url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
             TotalCheck.append(proc)
     threads = []
-    index = round(market.get_current_mark_price("BTCUSDTPERP")['indexPrice'])
+    index = round(float(market.get_ticker("BTCUSDTPERP")['price']))
     with ThreadPoolExecutor(max_workers=200) as executor:
         i = 0
         for url in url_list:
