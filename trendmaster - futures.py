@@ -1,8 +1,8 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "63327bbbb667660007b30596"
+SECRET = "8a0e4e71-bc4a-4461-a005-4bff399407b4"
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0008#Buy multiplier
@@ -104,7 +104,7 @@ while(True):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X, y, epochs=150, batch_size=10, verbose=0)
     model.save('my_model')
-    cancel_all = trade.cancel_order(order_id)
+    cancel_all = trade.cancel_all_limit_orders('BTCUSDTPERP')
     time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
