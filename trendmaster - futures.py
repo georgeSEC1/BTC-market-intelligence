@@ -1,8 +1,8 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "6322c494eedcca00073eb05a"
+SECRET = "9275fd55-0883-4ed8-b501-67197db39715"
 API_PASS = input("Please enter account password: ")
 modB = 1.0001
 modS = 1.0001
@@ -85,7 +85,7 @@ while(True):
     for line in string.split(","):
         if line.find("_") > -1 and line.find("BTC") > -1:     
             proc = line.split("\"")[1]
-            url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MONTH_1")
+            url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=HOUR_1")
             TotalCheck.append(proc)
     threads = []
     with ThreadPoolExecutor(max_workers=200) as executor:
@@ -104,7 +104,7 @@ while(True):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X, y, epochs=150, batch_size=10, verbose=0)
     model.save('my_model')
-    #cancel_all = trade.cancel_all_limit_orders(SYMBOL)
+    cancel_all = trade.cancel_all_limit_orders(SYMBOL)
     time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
