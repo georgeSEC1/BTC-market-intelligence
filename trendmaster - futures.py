@@ -4,9 +4,10 @@
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
-modB = 1.0011
-modS = 1.0011
-taker = 3
+modB = 1.002#Buy multiplier
+modS = 1.002#Sell multiplier
+risk = 3#maximum position quantity
+taker = 3#dev only
 import requests
 import os
 import keras
@@ -118,7 +119,9 @@ while(True):
     predictions = (model.predict(X) > 0.5).astype(int)
     print ("Price category & movement indicator for:", PAIR)
     print('%s => %d' % (X[0].tolist(), predictions[0]))
-    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+    checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
+    print(checkPos)
+    if predictions[0][0] == 0 and checkPos > risk-(risk*2) and checkPos < risk:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
             take = varZ.split('.')[1][-taker:]
@@ -139,7 +142,7 @@ while(True):
                 print("SELL @",varI)
         except:
             traceback.print_exc()
-    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if predictions[0][0] == 1 and checkPos > risk-(risk*2) and checkPos < risk:#TODO: adjust values, fix "invalid price", adjust scaling 
         testVar = 1
         if varX < 1:
             varZ = "%.8f" % varX
