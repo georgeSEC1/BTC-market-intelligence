@@ -4,7 +4,7 @@
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
-safetyThreshold = 5#
+safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0002#Buy multiplier
 modS = 1.0002#Sell multiplier
 risk = 3#maximum position quantity
