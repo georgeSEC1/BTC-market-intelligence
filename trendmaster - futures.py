@@ -118,7 +118,6 @@ while(True):
     print ("Price category & movement indicator for:", PAIR)
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
-    print(checkPos)
     if predictions[0][0] == 0 and checkPos > risk-(risk*2) and checkPos < risk:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
