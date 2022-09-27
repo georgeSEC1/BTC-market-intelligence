@@ -4,8 +4,8 @@
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
-modB = 1.002#Buy multiplier
-modS = 1.002#Sell multiplier
+modB = 1.0002#Buy multiplier
+modS = 1.0002#Sell multiplier
 risk = 3#maximum position quantity
 taker = 3#dev only
 import requests
@@ -26,15 +26,17 @@ rest_client = RestClient(API_KEY, SECRET, API_PASS)
 SYMBOL = 'BTCUSDTPERP'
 # Trade Functions
 trade = rest_client.trade_api()
+market = rest_client.market_api()
 var = 8
 tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
 recordPrev = 2
 stat = 0
+index = 0
 def download_resource(proc,url,mode):
     try:
-        valY = trade.get_position_details("BTCUSDTPERP")['markPrice']
+        valY = index 
         rx = requests.get(url)
         array = json.loads(rx.content.decode('utf-8'))
         go = 1
@@ -87,6 +89,7 @@ while(True):
             url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
             TotalCheck.append(proc)
     threads = []
+    index = round(market.get_current_mark_price("BTCUSDTPERP")['indexPrice'])
     with ThreadPoolExecutor(max_workers=200) as executor:
         i = 0
         for url in url_list:
@@ -169,5 +172,5 @@ while(True):
         recordPrev = predictions[0][0]
     if recordPrev == 2:
         recordPrev = 0
-    print("Theoretical success balance(from 0):" , stat)
+    print("Theoretical success weight(from 0):" , stat)
     
