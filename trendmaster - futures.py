@@ -4,6 +4,7 @@
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
+safetyThreshold = 5#
 modB = 1.0002#Buy multiplier
 modS = 1.0002#Sell multiplier
 risk = 3#maximum position quantity
@@ -27,6 +28,7 @@ SYMBOL = 'BTCUSDTPERP'
 # Trade Functions
 trade = rest_client.trade_api()
 market = rest_client.market_api()
+user = rest_client.user_api()
 var = 8
 tRounds = 5
 waitTime = 60
@@ -110,7 +112,7 @@ while(True):
     time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
-    url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MONTH_1"
+    url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
     download_resource(PAIR,url,1)
     dataset = loadtxt('realtime.csv', delimiter=',')
     X = dataset[:,0:var]
@@ -121,7 +123,8 @@ while(True):
     print ("Price category & movement indicator for:", PAIR)
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
-    if predictions[0][0] == 0 and checkPos > risk-(risk*2) and checkPos < risk:#TODO: adjust values, fix "invalid price", adjust scaling 
+    availBalance = user.get_account_overview()['availableBalance']
+    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
             take = varZ.split('.')[1][-taker:]
@@ -137,12 +140,12 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
         try:
-            if varX > 1:
+            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk and availBalance > safetyThreshold:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
         except:
             traceback.print_exc()
-    if predictions[0][0] == 1 and checkPos > risk-(risk*2) and checkPos < risk:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         testVar = 1
         if varX < 1:
             varZ = "%.8f" % varX
@@ -159,7 +162,7 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
         try:
-            if varX > 1:
+            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk and availBalance > safetyThreshold:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("BUY @",varI)
         except:
