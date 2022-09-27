@@ -5,8 +5,8 @@ API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
-modB = 1.0002#Buy multiplier
-modS = 1.0002#Sell multiplier
+modB = 1.0008#Buy multiplier
+modS = 1.0008#Sell multiplier
 risk = 3#maximum position quantity
 taker = 3#dev only
 import requests
@@ -69,6 +69,7 @@ def download_resource(proc,url,mode):
         return rx.status_code
     except requests.exceptions.RequestException as e:
        return e
+tradeVar = "test"
 while(True):
     xxx = open("test.csv", "w", encoding="utf8")
     TotalCheck = []
@@ -103,7 +104,7 @@ while(True):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X, y, epochs=150, batch_size=10, verbose=0)
     model.save('my_model')
-    cancel_all = trade.cancel_all_limit_orders('BTCUSDTPERP')
+    cancel_all = trade.cancel_order(order_id)
     time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
@@ -119,6 +120,8 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
     availBalance = user.get_account_overview()['availableBalance']
+    print(trade.get_position_details("BTCUSDTPERP"))
+    
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
