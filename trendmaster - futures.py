@@ -22,7 +22,6 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 import os
 from polofutures import RestClient
 import traceback
-
 rest_client = RestClient(API_KEY, SECRET, API_PASS)
 SYMBOL = 'BTCUSDTPERP'
 # Trade Functions
@@ -31,7 +30,6 @@ var = 8
 tRounds = 5
 waitTime = 60
 print("Trendmaster - 2022")
-
 recordPrev = 2
 stat = 0
 def download_resource(proc,url,mode):
