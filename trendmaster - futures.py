@@ -33,6 +33,7 @@ var = 8
 print("Trendmaster - 2022")
 stat = 0
 index = 0
+instance = 300
 def download_resource(proc,url,mode):
     try:
         valY = index 
@@ -120,7 +121,7 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
     availBalance = user.get_account_overview()['availableBalance']
- 
+    trade.cancel_all_stop_orders("BTCUSDTPERP")
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
@@ -137,9 +138,10 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
         try:
-            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk and availBalance > safetyThreshold:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))), stop = "down",stopPriceType = "IP", stopPrice = str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
+                time.sleep(instance)
         except:
             traceback.print_exc()
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
@@ -159,8 +161,9 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
         try:
-            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk and availBalance > safetyThreshold:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk :
+                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))), stop = "up",stopPriceType = "IP", stopPrice = str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("BUY @",varI)
+                time.sleep(instance)
         except:
             traceback.print_exc()
