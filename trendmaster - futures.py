@@ -1,8 +1,8 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "63333b90c0952b0007695b16"
+SECRET = "43a17675-5228-4d7f-b04c-cf402a9f6d4c"
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0008#Buy multiplier
@@ -33,7 +33,7 @@ var = 8
 print("Trendmaster - 2022")
 stat = 0
 index = 0
-instance = 300
+instance = 60
 def download_resource(proc,url,mode):
     try:
         valY = index 
