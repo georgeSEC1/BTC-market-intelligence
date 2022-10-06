@@ -105,8 +105,6 @@ while(True):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X, y, epochs=150, batch_size=10, verbose=0)
     model.save('my_model')
-    cancel_all = trade.cancel_all_limit_orders('BTCUSDTPERP')
-    time.sleep(1)
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
     url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
@@ -139,7 +137,7 @@ while(True):
             print("Trendmaster could SELL @",varI)
         try:
             if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))), stop = "down",stopPriceType = "IP", stopPrice = str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))), stop = "down",stopPriceType = "IP", stopPrice = index )#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 time.sleep(instance)
         except:
@@ -162,7 +160,7 @@ while(True):
             print("Trendmaster could BUY @",varI)
         try:
             if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))), stop = "up",stopPriceType = "IP", stopPrice = str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))), stop = "up",stopPriceType = "IP", stopPrice = index )
                 print("BUY @",varI)
                 time.sleep(instance)
         except:
