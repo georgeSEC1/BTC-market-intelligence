@@ -1,12 +1,12 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = "63333b90c0952b0007695b16"
-SECRET = "43a17675-5228-4d7f-b04c-cf402a9f6d4c"
+API_KEY = ""
+SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
-modB = 1.0008#Buy multiplier
-modS = 1.0008#Sell multiplier
+modB = 1.0004#Buy multiplier
+modS = 1.0004#Sell multiplier
 risk = 3#maximum position quantity
 taker = 3#dev only
 import requests
@@ -33,7 +33,7 @@ var = 8
 print("Trendmaster - 2022")
 stat = 0
 index = 0
-instance = 60
+instance = 1
 def download_resource(proc,url,mode):
     try:
         valY = index 
@@ -71,6 +71,7 @@ def download_resource(proc,url,mode):
     except requests.exceptions.RequestException as e:
        return e
 tradeVar = "test"
+counter = 0
 while(True):
     xxx = open("test.csv", "w", encoding="utf8")
     TotalCheck = []
@@ -119,7 +120,9 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
     availBalance = user.get_account_overview()['availableBalance']
-    trade.cancel_all_stop_orders("BTCUSDTPERP")
+    if counter >= 5:
+        trade.cancel_all_stop_orders("BTCUSDTPERP")
+        counter = 0
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
@@ -139,6 +142,7 @@ while(True):
             if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))), stop = "down",stopPriceType = "IP", stopPrice = index )#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
+                counter+=1
                 time.sleep(instance)
         except:
             traceback.print_exc()
@@ -162,6 +166,7 @@ while(True):
             if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))), stop = "up",stopPriceType = "IP", stopPrice = index )
                 print("BUY @",varI)
+                counter+=1
                 time.sleep(instance)
         except:
             traceback.print_exc()
