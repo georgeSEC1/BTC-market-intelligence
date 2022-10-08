@@ -1,8 +1,8 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "633f5806eedcca00073eb6ce"
+SECRET = "234d9db3-390a-4339-b732-8b5cd4683bd3"
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
@@ -122,6 +122,7 @@ while(True):
     availBalance = user.get_account_overview()['availableBalance']
     if counter >= 5:
         trade.cancel_all_stop_orders("BTCUSDTPERP")
+        print("Cancelling stale orders")
         counter = 0
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
