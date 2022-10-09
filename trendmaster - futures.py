@@ -1,6 +1,5 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
-# Account Keys
 print()
 print("==================================================================================================")
 print()
@@ -8,6 +7,7 @@ print("Trendmaster - 2022")
 print()
 print("==================================================================================================")
 print()
+#Account Keys
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
@@ -16,7 +16,8 @@ modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
 profitLever = 0.05#Pct
 expectanceMultiplier = 5
-refreshLimit = 5
+load = 1
+refreshLimit = 60
 from playsound import playsound
 import requests
 import os
@@ -43,7 +44,6 @@ taker = 3#dev only
 stat = 0
 index = 0
 instance = 1
-
 def download_resource(proc,url,mode):#multithreading capable downloader, NN multimode
     try:
         valY = index 
@@ -167,12 +167,12 @@ while(True):
             print("Trendmaster could SELL @",varI)
             counter+=1#remove hypothetical
         try:
-            if varX > 1 and checkPos > -1 and checkPosX < profitLever :
+            if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
                 time.sleep(instance)
-            if varX > 1 and checkPos > -1 and checkPosX >= profitLever*expectanceMultiplier :
+            if varX > 1 and checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier :
                 playsound('profit.mp3')
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("Profit made!")
@@ -199,12 +199,12 @@ while(True):
             print("Trendmaster could BUY @",varI)
             counter+=1#remove hypothetical
         try:
-            if varX > 1 and checkPos < 1 and checkPosX < profitLever :
+            if varX > 1 and checkPos < load and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
                 print("BUY @",varI)
                 counter+=1
                 time.sleep(instance)
-            if varX > 1 and checkPos < 1 and checkPosX >= profitLever*expectanceMultiplier :
+            if varX > 1 and checkPos < load and checkPosX >= profitLever*expectanceMultiplier :
                 playsound('profit.mp3')
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("Profit made!")
