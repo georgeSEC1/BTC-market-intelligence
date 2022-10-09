@@ -7,7 +7,7 @@ API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
-risk = 3#maximum position quantity
+risk = 1#maximum position quantity
 taker = 3#dev only
 import requests
 import os
@@ -140,8 +140,8 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
         try:
-            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))), stop = "down",stopPriceType = "IP", stopPrice = index )#symbol,side,leverage,quantity,price
+            if varX > 1 and checkPos > -1 and checkPos < risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
                 time.sleep(instance)
@@ -164,8 +164,8 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
         try:
-            if varX > 1 and checkPos > risk-(risk*2) and checkPos < risk :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))), stop = "up",stopPriceType = "IP", stopPrice = index )
+            if varX > 1 and checkPos < 1 and checkPos < risk :
+                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
                 print("BUY @",varI)
                 counter+=1
                 time.sleep(instance)
