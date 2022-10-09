@@ -149,7 +149,7 @@ while(True):
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
     availBalance = user.get_account_overview()['availableBalance']#balance information
-    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if predictions[0][0] == 0 and availBalance > safetyThreshold:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
             take = varZ.split('.')[1][-taker:]
@@ -180,7 +180,7 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if predictions[0][0] == 1 and availBalance > safetyThreshold:#TODO: adjust values, fix "invalid price", adjust scaling 
         testVar = 1
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
