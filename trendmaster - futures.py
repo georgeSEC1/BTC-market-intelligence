@@ -1,14 +1,15 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
-API_KEY = "633f5806eedcca00073eb6ce"
-SECRET = "234d9db3-390a-4339-b732-8b5cd4683bd3"
+API_KEY = ""
+SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
-profitLever = 0.10#Pct
-
+profitLever = 0.05#Pct
+expectanceMultiplier = 5
+from playsound import playsound
 import requests
 import os
 import keras
@@ -147,6 +148,12 @@ while(True):
                 print("SELL @",varI)
                 counter+=1
                 time.sleep(instance)
+            if varX > 1 and checkPos > -1 and checkPosX >= profitLever*expectanceMultiplier :
+                playsound('profit.mp3')
+                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                print("Profit made!")
+                counter+=1
+                time.sleep(instance)
         except:
             traceback.print_exc()
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
@@ -169,6 +176,12 @@ while(True):
             if varX > 1 and checkPos < 1 and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
                 print("BUY @",varI)
+                counter+=1
+                time.sleep(instance)
+            if varX > 1 and checkPos < 1 and checkPosX >= profitLever*expectanceMultiplier :
+                playsound('profit.mp3')
+                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                print("Profit made!")
                 counter+=1
                 time.sleep(instance)
         except:
