@@ -1,6 +1,13 @@
 #copyright - george wagenknecht - Trendmaster - 2022 - all rights reserved
 #Poloniex trading bot
 # Account Keys
+print()
+print("==================================================================================================")
+print()
+print("Trendmaster - 2022")
+print()
+print("==================================================================================================")
+print()
 API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
@@ -9,6 +16,7 @@ modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
 profitLever = 0.05#Pct
 expectanceMultiplier = 5
+refreshLimit = 5
 from playsound import playsound
 import requests
 import os
@@ -35,7 +43,7 @@ taker = 3#dev only
 stat = 0
 index = 0
 instance = 1
-print("Trendmaster - 2022")
+
 def download_resource(proc,url,mode):
     try:
         valY = index 
@@ -58,12 +66,13 @@ def download_resource(proc,url,mode):
                     totalPAIR.append(proc)
                 go = 0
                 xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
+                xxx.flush()
             if float(valA) > float(valB) and mode == 0:
                 if go == 1:
                     totalPAIR.append(proc)
                 go = 0
                 xxx.write(str(val1) +","+ str(val2)  +","+str(float(valA))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",0\n")#todo, add more variables
-            xxx.flush()
+                xxx.flush()
             if mode == 1 and url.find("BTC_USDT") > -1:
                 xxxx = open("realtime.csv", "w", encoding="utf8")
                 xxxx.write(str(val1) +","+ str(val2)  +","+str(float(valY))+ ","+str(val3) +","+ str(val4) +","+ str(val5) +","+ str(val6) +","+ str(val7)+ ",1\n")#todo, add more variables
@@ -72,42 +81,55 @@ def download_resource(proc,url,mode):
         return rx.status_code
     except requests.exceptions.RequestException as e:
        return e
-tradeVar = "test"
 counter = 0
+refresh = 1
 while(True):
-    xxx = open("test.csv", "w", encoding="utf8")
-    TotalCheck = []
-    totalPAIR = []
     print()
-    print("Loading...")
-    url_list = []
-    r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
-    string = r.text
-    TotalCheck = []
-    totalPAIR = []
-    for line in string.split(","):
-        if line.find("_") > -1 and line.find("BTC") > -1:     
-            proc = line.split("\"")[1]
-            url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
-            TotalCheck.append(proc)
-    threads = []
+    print("==================================================================================================")
+    print()
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))
-    with ThreadPoolExecutor(max_workers=200) as executor:
-        i = 0
-        for url in url_list:
-            if i < len(TotalCheck):
-                threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
-            i+=1
-    dataset = loadtxt('test.csv', delimiter=',')
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    model = Sequential()
-    model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
-    model.add(Dense(50, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X, y, epochs=150, batch_size=10, verbose=0)
-    model.save('my_model')
+    if refresh == 1:
+        xxx = open("test.csv", "w", encoding="utf8")
+        TotalCheck = []
+        totalPAIR = []
+        print()
+        print("==================================================================================================")
+        print()
+        print("Loading...")
+        print()
+        print("==================================================================================================")
+        print()
+        url_list = []
+        r = requests.get("https://poloniex.com/public?command=return24hVolume")#proc.conf
+        string = r.text
+        TotalCheck = []
+        totalPAIR = []
+        for line in string.split(","):
+            if line.find("_") > -1 and line.find("BTC") > -1:     
+                proc = line.split("\"")[1]
+                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")
+                TotalCheck.append(proc)
+        threads = []
+        with ThreadPoolExecutor(max_workers=200) as executor:
+            i = 0
+            for url in url_list:
+                if i < len(TotalCheck):
+                    threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
+                i+=1
+        dataset = loadtxt('test.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = Sequential()
+        model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
+        model.add(Dense(50, activation='relu'))
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.fit(X, y, epochs=150, batch_size=10, verbose=0)
+        model.save('my_model')
+        refresh = 0
+        print()
+        print("==================================================================================================")
+        print()
     #for PAIR in totalPAIR:
     PAIR = "BTC_USDT"
     url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
@@ -122,11 +144,7 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']
-    availBalance = user.get_account_overview()['availableBalance']
-    if counter >= 5:
-        trade.cancel_all_stop_orders("BTCUSDTPERP")
-        print("Cancelling stale orders")
-        counter = 0
+    availBalance = user.get_account_overview()['availableBalance']    
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:
             varZ = "%.8f" % varX
@@ -138,10 +156,12 @@ while(True):
                 i+=1
             varI = "%.8f" % (varX+float(mag+str(take)))
             print("Trendmaster could SELL @",varI)
+            counter+=1#remove hypothetical
         if varX > 1:
             varI = varX/modS
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
+            counter+=1#remove hypothetical
         try:
             if varX > 1 and checkPos > -1 and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
@@ -168,10 +188,12 @@ while(True):
                 i+=1
             varI = "%.8f" % (varX+float(mag+str(take)))
             print("Trendmaster could BUY @",varI)
+            counter+=1#remove hypothetical
         if varX > 1:
             varI = varX*modS
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
+            counter+=1#remove hypothetical
         try:
             if varX > 1 and checkPos < 1 and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
@@ -186,3 +208,15 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()
+    if counter >= refreshLimit:
+        time.sleep(instance)
+        trade.cancel_all_stop_orders("BTCUSDTPERP")
+        print()
+        print("==================================================================================================")
+        print()
+        print("Refreshing Trendmaster")
+        print()
+        print("==================================================================================================")
+        print()
+        refresh = 1
+        counter = 0
