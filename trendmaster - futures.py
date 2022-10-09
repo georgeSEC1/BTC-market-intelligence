@@ -149,7 +149,7 @@ while(True):
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
     availBalance = user.get_account_overview()['availableBalance']#balance information
-    if predictions[0][0] == 0 and availBalance > safetyThreshold:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
             take = varZ.split('.')[1][-taker:]
@@ -167,12 +167,12 @@ while(True):
             print("Trendmaster could SELL @",varI)
             counter+=1#remove hypothetical
         try:
-            if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever :
+            if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever and availBalance > safetyThreshold :
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
                 time.sleep(instance)
-            if varX > 1 and checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier :
+            if varX > 1 and checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier and availBalance > safetyThreshold :
                 playsound('profit.mp3')
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("Profit made!")
@@ -180,7 +180,7 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-    if predictions[0][0] == 1 and availBalance > safetyThreshold:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         testVar = 1
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
@@ -199,12 +199,12 @@ while(True):
             print("Trendmaster could BUY @",varI)
             counter+=1#remove hypothetical
         try:
-            if varX > 1 and checkPos < load and checkPosX < profitLever :
+            if varX > 1 and checkPos < load and checkPosX < profitLever and availBalance > safetyThreshold :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
                 print("BUY @",varI)
                 counter+=1
                 time.sleep(instance)
-            if varX > 1 and checkPos < load and checkPosX >= profitLever*expectanceMultiplier :
+            if varX > 1 and checkPos < load and checkPosX >= profitLever*expectanceMultiplier and availBalance > safetyThreshold :
                 playsound('profit.mp3')
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("Profit made!")
