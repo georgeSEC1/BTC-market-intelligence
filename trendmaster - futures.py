@@ -7,8 +7,8 @@ API_PASS = input("Please enter account password: ")
 safetyThreshold = 5#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
-risk = 1#maximum position quantity
-taker = 3#dev only
+profitLever = 0.10#Pct
+
 import requests
 import os
 import keras
@@ -30,10 +30,11 @@ trade = rest_client.trade_api()
 market = rest_client.market_api()
 user = rest_client.user_api()
 var = 8
-print("Trendmaster - 2022")
+taker = 3#dev only
 stat = 0
 index = 0
 instance = 1
+print("Trendmaster - 2022")
 def download_resource(proc,url,mode):
     try:
         valY = index 
@@ -119,6 +120,7 @@ while(True):
     print ("Price category & movement indicator for:", PAIR)
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']
+    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']
     availBalance = user.get_account_overview()['availableBalance']
     if counter >= 5:
         trade.cancel_all_stop_orders("BTCUSDTPERP")
@@ -140,7 +142,7 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
         try:
-            if varX > 1 and checkPos > -1 and checkPos < risk:
+            if varX > 1 and checkPos > -1 and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
@@ -164,7 +166,7 @@ while(True):
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
         try:
-            if varX > 1 and checkPos < 1 and checkPos < risk :
+            if varX > 1 and checkPos < 1 and checkPosX < profitLever :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
                 print("BUY @",varI)
                 counter+=1
