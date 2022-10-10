@@ -8,14 +8,14 @@ print()
 print("==================================================================================================")
 print()
 #Account Keys
-API_KEY = "63437eb8c0952b0007695f96"
-SECRET = "f70dbe12-038b-4483-bbeb-c64e045f3535"
+API_KEY = ""
+SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
 leverage = 100
-amount = 2
+amount = 4
 profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 5
 load = 1
