@@ -8,13 +8,14 @@ print()
 print("==================================================================================================")
 print()
 #Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "63437eb8c0952b0007695f96"
+SECRET = "f70dbe12-038b-4483-bbeb-c64e045f3535"
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
 leverage = 100
+amount = 2
 profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 5
 load = 1
@@ -150,6 +151,7 @@ while(True):
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
     availBalance = user.get_account_overview()['availableBalance']#balance information
+    trade.cancel_all_stop_orders("BTCUSDTPERP")
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
@@ -169,14 +171,8 @@ while(True):
             counter+=1
         try:
             if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
-                counter+=1
-                time.sleep(instance)
-            if varX > 1 and checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier and availBalance > safetyThreshold :
-                playsound('profit.mp3')
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
-                print("Profit made!")
                 counter+=1
                 time.sleep(instance)
         except:
@@ -201,21 +197,26 @@ while(True):
             counter+=1
         try:
             if varX > 1 and checkPos < load and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, '1', str(round(float(varI))))
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))
                 print("BUY @",varI)
-                counter+=1
-                time.sleep(instance)
-            if varX > 1 and checkPos < load and checkPosX >= profitLever*expectanceMultiplier and availBalance > safetyThreshold :
-                playsound('profit.mp3')
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
-                print("Profit made!")
                 counter+=1
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
+    if checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier:
+        playsound('profit.mp3')
+        order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+        print("Profit made!")
+        counter+=1
+        time.sleep(instance)
+    if checkPos < load and checkPosX >= profitLever*expectanceMultiplier :
+        playsound('profit.mp3')
+        order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+        print("Profit made!")
+        counter+=1
+        time.sleep(instance)
     if counter >= refreshLimit:
         time.sleep(instance)
-        trade.cancel_all_stop_orders("BTCUSDTPERP")
         print()
         print("==================================================================================================")
         print()
