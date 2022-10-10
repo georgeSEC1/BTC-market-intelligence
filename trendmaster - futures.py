@@ -214,7 +214,7 @@ while(True):
             counter+=1
             time.sleep(instance)
             break
-    if checkPos < load-(load+load) and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
+    if checkPos > load-(load+load) and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
