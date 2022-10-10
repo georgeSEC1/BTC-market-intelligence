@@ -8,8 +8,8 @@ print()
 print("==================================================================================================")
 print()
 #Account Keys
-API_KEY = "63438e087cdf170007e21a9f"
-SECRET = "c514031d-df5d-4ba8-9379-99e0b303e2c5"
+API_KEY = ""
+SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
@@ -181,7 +181,7 @@ while(True):
         except:
             traceback.print_exc()#added exception to avoid completely stopping
         print(checkPosX , checkPosY)
-        if checkPos < load and checkPosX > abs(checkPosY)*modG:
+        if checkPos < load and checkPosX+0.00001 > (abs(checkPosY)+0.00001)*modG:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
             print("Profit made!")
@@ -214,7 +214,7 @@ while(True):
         except:
             traceback.print_exc()#added exception to avoid completely stopping
         print(checkPosX , checkPosY)    
-        if checkPos > load-(load+load) and checkPosX > abs(checkPosY)*modG:
+        if checkPos > load-(load+load) and checkPosX+0.00001 > (abs(checkPosY)+0.00001)*modG:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
