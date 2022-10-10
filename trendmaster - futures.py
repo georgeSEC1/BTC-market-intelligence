@@ -8,18 +8,19 @@ print()
 print("==================================================================================================")
 print()
 #Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "63438e087cdf170007e21a9f"
+SECRET = "c514031d-df5d-4ba8-9379-99e0b303e2c5"
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
+modG = 2#generic multiplier
 leverage = 100
 amount = 1
 profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 10
-load = 2
-refreshLimit = 5
+load = 1
+refreshLimit = 50
 from playsound import playsound
 import requests
 import os
@@ -172,14 +173,15 @@ while(True):
             print("Trendmaster could SELL @",varI)
             counter+=1
         try:
-            if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever and availBalance > safetyThreshold :
+            if varX > 1 and checkPos > load-(load+load) and checkPosX < profitLever and availBalance > safetyThreshold :
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-        if checkPos < load and checkPosX >= abs(checkPosY):
+        print(checkPosX , checkPosY)
+        if checkPos < load and checkPosX > abs(checkPosY)*modG:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
             print("Profit made!")
@@ -211,7 +213,8 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-        if checkPos > load-(load*2) and checkPosX > abs(checkPosY):
+        print(checkPosX , checkPosY)    
+        if checkPos > load-(load+load) and checkPosX > abs(checkPosY)*modG:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
