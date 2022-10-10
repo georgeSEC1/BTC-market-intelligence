@@ -181,7 +181,7 @@ while(True):
         except:
             traceback.print_exc()#added exception to avoid completely stopping
         print(checkPosX , checkPosY)
-        if checkPos < load and checkPosX+0.00001 > (abs(checkPosY)+0.00001)*modG:
+        if checkPos < load and checkPosX+0.1 > (abs(checkPosY)+0.1)*modG:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
             print("Profit made!")
@@ -214,7 +214,7 @@ while(True):
         except:
             traceback.print_exc()#added exception to avoid completely stopping
         print(checkPosX , checkPosY)    
-        if checkPos > load-(load+load) and checkPosX+0.00001 > (abs(checkPosY)+0.00001)*modG:
+        if checkPos > load-(load+load) and checkPosX+0.1 > (abs(checkPosY)+0.1)*modG:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
