@@ -14,7 +14,8 @@ API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
-profitLever = 0.01#Pct
+leverage = 100
+profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 5
 load = 1
 refreshLimit = 5
@@ -168,13 +169,13 @@ while(True):
             counter+=1
         try:
             if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
                 time.sleep(instance)
             if varX > 1 and checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier and availBalance > safetyThreshold :
                 playsound('profit.mp3')
-                order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("Profit made!")
                 counter+=1
                 time.sleep(instance)
@@ -200,13 +201,13 @@ while(True):
             counter+=1
         try:
             if varX > 1 and checkPos < load and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, '1', str(round(float(varI))))
                 print("BUY @",varI)
                 counter+=1
                 time.sleep(instance)
             if varX > 1 and checkPos < load and checkPosX >= profitLever*expectanceMultiplier and availBalance > safetyThreshold :
                 playsound('profit.mp3')
-                order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("Profit made!")
                 counter+=1
                 time.sleep(instance)
