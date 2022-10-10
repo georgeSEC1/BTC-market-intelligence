@@ -12,9 +12,9 @@ API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
-modB = 1.0004#Buy multiplier
-modS = 1.0004#Sell multiplier
-modG = 1.58#generic multiplier
+modB = 1.0002#Buy multiplier
+modS = 1.0002#Sell multiplier
+modG = 1.28#generic multiplier
 leverage = 100
 amount = 1
 profitLever = 0.01/leverage#Pct
@@ -211,7 +211,7 @@ while(True):
     if checkPos < load and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0 and go2 == 1:
             go = 0
             playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, )#symbol,side,leverage,quantity,price
+            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,index )#symbol,side,leverage,quantity,price
             print("Profit made!")
             counter+=1
             time.sleep(instance)
