@@ -160,10 +160,12 @@ while(True):
                 i+=1
             varI = "%.8f" % (varX+float(mag+str(take)))
             print("Trendmaster could SELL @",varI)
+            counter+=1
         if varX > 1:#large coin processing
             varI = varX/modS#adjust price
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
+            counter+=1
         try:
             if varX > 1 and checkPos > load-(load*2) and checkPosX < profitLever and availBalance > safetyThreshold :
                 order_id = trade.create_limit_order(SYMBOL, 'sell', '100', '1', str(round(float(varI))))#symbol,side,leverage,quantity,price
@@ -190,10 +192,12 @@ while(True):
                 i+=1
             varI = "%.8f" % (varX+float(mag+str(take)))
             print("Trendmaster could BUY @",varI)
+            counter+=1
         if varX > 1:#large coin processing
             varI = varX*modS#adjust price
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
+            counter+=1
         try:
             if varX > 1 and checkPos < load and checkPosX < profitLever and availBalance > safetyThreshold :
                 order_id = trade.create_limit_order(SYMBOL, 'buy', '100', '1', str(round(float(varI))))
