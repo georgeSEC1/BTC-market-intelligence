@@ -17,7 +17,7 @@ modS = 1.0004#Sell multiplier
 profitLever = 0.01#Pct
 expectanceMultiplier = 5
 load = 1
-refreshLimit = 10
+refreshLimit = 5
 from playsound import playsound
 import requests
 import os
