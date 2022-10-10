@@ -14,7 +14,7 @@ API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
-modG = 1.08#generic multiplier
+modG = 1.58#generic multiplier
 leverage = 100
 amount = 1
 profitLever = 0.01/leverage#Pct
@@ -207,20 +207,21 @@ while(True):
         except:
             traceback.print_exc()#added exception to avoid completely stopping  
     #and checkPosX >= profitLever*expectanceMultiplier #greed function
-    if checkPos < load and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
+    go2 = 1
+    if checkPos < load and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0 and go2 == 1:
+            go = 0
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, )#symbol,side,leverage,quantity,price
             print("Profit made!")
             counter+=1
             time.sleep(instance)
-            break
-    if checkPos > load-(load+load) and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
+    if checkPos > load-(load+load) and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0 and go2 == 1:
+            go = 0
             playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
             counter+=1
             time.sleep(instance)
-            break
     if counter >= refreshLimit:
         time.sleep(instance)
         print()
