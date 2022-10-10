@@ -20,7 +20,7 @@ amount = 1
 profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 5
 load = 1
-refreshLimit = 50
+refreshLimit = 10
 from playsound import playsound
 import requests
 import os
@@ -180,6 +180,12 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
+        if checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
+            playsound('profit.mp3')
+            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+            print("Profit made!")
+            counter+=1
+            time.sleep(instance)
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         testVar = 1
         if varX < 1:#alt coin processing
@@ -206,22 +212,13 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping  
-    #and checkPosX >= profitLever*expectanceMultiplier #greed function
-    go2 = 1
-    if checkPos < load and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0 and go2 == 1:
-            go = 0
+        if checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
             playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,index )#symbol,side,leverage,quantity,price
+            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
             counter+=1
             time.sleep(instance)
-    if checkPos > load-(load+load) and checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0 and go2 == 1:
-            go = 0
-            playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-            print("Profit made!")
-            counter+=1
-            time.sleep(instance)
+    #and checkPosX >= profitLever*expectanceMultiplier #greed function    
     if counter >= refreshLimit:
         time.sleep(instance)
         print()
