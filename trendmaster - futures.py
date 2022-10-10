@@ -15,10 +15,10 @@ safetyThreshold = 1#stop trading if balance is under safetyThreshold
 modB = 1.0004#Buy multiplier
 modS = 1.0004#Sell multiplier
 leverage = 100
-amount = 4
+amount = 1
 profitLever = 0.01/leverage#Pct
-expectanceMultiplier = 5
-load = 1
+expectanceMultiplier = 10
+load = 2
 refreshLimit = 5
 from playsound import playsound
 import requests
@@ -149,9 +149,11 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     #Neural network prediction code
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
-    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
+    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
+    checkPosY = trade.get_position_details("BTCUSDTPERP")['realisedPnl']#position information
     availBalance = user.get_account_overview()['availableBalance']#balance information
-    trade.cancel_all_stop_orders("BTCUSDTPERP")
+    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
+    print(checkPosX)
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
@@ -177,6 +179,12 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
+        if checkPos < load and checkPosX >= abs(checkPosY):
+            playsound('profit.mp3')
+            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+            print("Profit made!")
+            counter+=1
+            time.sleep(instance)
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         testVar = 1
         if varX < 1:#alt coin processing
@@ -197,24 +205,19 @@ while(True):
             counter+=1
         try:
             if varX > 1 and checkPos < load and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)
                 print("BUY @",varI)
                 counter+=1
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-    if checkPos > load-(load*2) and checkPosX >= profitLever*expectanceMultiplier:
-        playsound('profit.mp3')
-        order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
-        print("Profit made!")
-        counter+=1
-        time.sleep(instance)
-    if checkPos < load and checkPosX >= profitLever*expectanceMultiplier :
-        playsound('profit.mp3')
-        order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
-        print("Profit made!")
-        counter+=1
-        time.sleep(instance)
+        if checkPos > load-(load*2) and checkPosX > abs(checkPosY):
+            playsound('profit.mp3')
+            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+            print("Profit made!")
+            counter+=1
+            time.sleep(instance)
+    #and checkPosX >= profitLever*expectanceMultiplier #greed function
     if counter >= refreshLimit:
         time.sleep(instance)
         print()
