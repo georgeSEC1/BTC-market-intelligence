@@ -12,8 +12,8 @@ API_KEY = ""
 SECRET = ""
 API_PASS = input("Please enter account password: ")
 safetyThreshold = 1#stop trading if balance is under safetyThreshold
-modB = 1.0002#Buy multiplier
-modS = 1.0002#Sell multiplier
+modB = 1.00005#Buy multiplier
+modS = 1.00005#Sell multiplier
 modG = 1.28#generic multiplier
 leverage = 100
 amount = 1
@@ -46,7 +46,7 @@ var = 8
 taker = 3#dev only
 stat = 0
 index = 0
-instance = 1
+instance = 5
 def download_resource(proc,url,mode):#multithreading capable downloader, NN multimode
     try:
         valY = index 
@@ -153,8 +153,6 @@ while(True):
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
     checkPosY = trade.get_position_details("BTCUSDTPERP")['realisedPnl']#position information
     availBalance = user.get_account_overview()['availableBalance']#balance information
-    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
-    print(checkPosX)
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
@@ -168,7 +166,7 @@ while(True):
             print("Trendmaster could SELL @",varI)
             counter+=1
         if varX > 1:#large coin processing
-            varI = varX/modS#adjust price
+            varI = varX*modS#adjust price
             varI = "%.2f" % varI
             print("Trendmaster could SELL @",varI)
             counter+=1
@@ -200,7 +198,7 @@ while(True):
             print("Trendmaster could BUY @",varI)
             counter+=1
         if varX > 1:#large coin processing
-            varI = varX*modS#adjust price
+            varI = varX/modS#adjust price
             varI = "%.2f" % varI
             print("Trendmaster could BUY @",varI)
             counter+=1
@@ -214,13 +212,15 @@ while(True):
             traceback.print_exc()#added exception to avoid completely stopping  
         if checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
             playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
             counter+=1
             time.sleep(instance)
     #and checkPosX >= profitLever*expectanceMultiplier #greed function    
     if counter >= refreshLimit:
         time.sleep(instance)
+        cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
+
         print()
         print("==================================================================================================")
         print()
