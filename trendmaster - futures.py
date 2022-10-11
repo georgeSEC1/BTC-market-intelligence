@@ -18,7 +18,7 @@ modG = 1.28#generic multiplier
 leverage = 100
 amount = 1
 profitLever = 0.01/leverage#Pct
-expectanceMultiplier = 5
+expectanceMultiplier = 12
 load = 1
 refreshLimit = 10
 from playsound import playsound
@@ -110,7 +110,7 @@ while(True):
         for line in string.split(","):
             if line.find("_") > -1 and line.find("BTC") > -1:     
                 proc = line.split("\"")[1]
-                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")#get candle data iterator
+                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_5")#get candle data iterator
                 TotalCheck.append(proc)
         threads = []
         with ThreadPoolExecutor(max_workers=200) as executor:#multithreading
@@ -153,6 +153,7 @@ while(True):
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
     checkPosY = trade.get_position_details("BTCUSDTPERP")['realisedPnl']#position information
     availBalance = user.get_account_overview()['availableBalance']#balance information
+    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
@@ -178,10 +179,15 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-        if checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
+        if checkPosX+modG > abs(checkPosY) and checkPosX+modG >= profitLever*expectanceMultiplier and checkPosX > 0:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
+            counter+=1
+            time.sleep(instance)
+        if checkPosX+modG < checkPosY and checkPosX+modG <= 0-profitLever*expectanceMultiplier and checkPosX < 0:
+            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+            print("Avoided loss!")
             counter+=1
             time.sleep(instance)
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
@@ -210,17 +216,20 @@ while(True):
                 time.sleep(instance)
         except:
             traceback.print_exc()#added exception to avoid completely stopping  
-        if checkPosX+modG > (abs(checkPosY)*modG)+modG and checkPosX > 0:
+        if checkPosX+modG > abs(checkPosY) and checkPosX+modG >= profitLever*expectanceMultiplier and checkPosX > 0:
             playsound('profit.mp3')
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
             print("Profit made!")
             counter+=1
             time.sleep(instance)
+        if checkPosX+modG < checkPosY and checkPosX+modG <= 0-profitLever*expectanceMultiplier and checkPosX < 0:
+            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+            print("Avoided loss!")
+            counter+=1
+            time.sleep(instance)
     #and checkPosX >= profitLever*expectanceMultiplier #greed function    
     if counter >= refreshLimit:
         time.sleep(instance)
-        cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
-
         print()
         print("==================================================================================================")
         print()
