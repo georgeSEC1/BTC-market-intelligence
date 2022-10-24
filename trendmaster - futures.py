@@ -22,7 +22,7 @@ expectanceMultiplier = 12
 load = 1
 refreshLimit = 5
 tickDefault = 0.001
-lossLimit = -0.001
+lossLimit = -0.0005
 from playsound import playsound
 import requests
 import os
