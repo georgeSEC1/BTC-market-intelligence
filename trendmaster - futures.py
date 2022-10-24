@@ -113,7 +113,7 @@ while(True):
         for line in string.split(","):
             if line.find("_") > -1 and line.find("BTC") > -1:     
                 proc = line.split("\"")[1]
-                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_5")#get candle data iterator
+                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")#get candle data iterator
                 TotalCheck.append(proc)
         threads = []
         with ThreadPoolExecutor(max_workers=200) as executor:#multithreading
