@@ -20,7 +20,8 @@ amount = 1
 profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 12
 load = 1
-refreshLimit = 10
+refreshLimit = 5
+tickDefault = 0.10
 from playsound import playsound
 import requests
 import os
@@ -86,12 +87,14 @@ def download_resource(proc,url,mode):#multithreading capable downloader, NN mult
        return e
 counter = 0
 refresh = 1
+init = 1
 while(True):
     print()
     print("==================================================================================================")
     print()
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
     if refresh == 1:
+        tick = tickDefault
         xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
         TotalCheck = []
         totalPAIR = []
@@ -150,83 +153,117 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     #Neural network prediction code
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
-    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
-    checkPosY = trade.get_position_details("BTCUSDTPERP")['realisedPnl']#position information
-    availBalance = user.get_account_overview()['availableBalance']#balance information
+    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
+    if checkPosX > tick:
+        tick+=tick
+        playsound('profit.mp3')
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
-    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
-        if varX < 1:#alt coin processing
-            varZ = "%.8f" % varX
-            take = varZ.split('.')[1][-taker:]
-            i = 0
-            mag = "0."
-            while(i+len(str(take)) < len(str(varX))-2):
-                mag+="0"
-                i+=1
-            varI = "%.8f" % (varX+float(mag+str(take)))
-            print("Trendmaster could SELL @",varI)
-            counter+=1
-        if varX > 1:#large coin processing
-            varI = varX*modS#adjust price
-            varI = "%.2f" % varI
-            print("Trendmaster could SELL @",varI)
-            counter+=1
-        try:
-            if varX > 1 and checkPos > load-(load+load) and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
-                print("SELL @",varI)
+    if init == 0:  
+        if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+            if varX < 1:#alt coin processing
+                varZ = "%.8f" % varX
+                take = varZ.split('.')[1][-taker:]
+                i = 0
+                mag = "0."
+                while(i+len(str(take)) < len(str(varX))-2):
+                    mag+="0"
+                    i+=1
+                varI = "%.8f" % (varX+float(mag+str(take)))
+                print("Trendmaster could SELL @",varI)
                 counter+=1
-                time.sleep(instance)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
-        if checkPosX+modG > abs(checkPosY) and checkPosX+modG >= profitLever*expectanceMultiplier and checkPosX > 0:
-            playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-            print("Profit made!")
-            counter+=1
-            time.sleep(instance)
-        if checkPosX+modG < checkPosY and checkPosX+modG <= 0-profitLever*expectanceMultiplier and checkPosX < 0:
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-            print("Avoided loss!")
-            counter+=1
-            time.sleep(instance)
-    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
-        testVar = 1
-        if varX < 1:#alt coin processing
-            varZ = "%.8f" % varX
-            take = varZ.split('.')[1][-3:]
-            i = 0
-            mag = "0."
-            while(i+len(str(taker)) < len(str(varX))-2):
-                mag+="0"
-                i+=1
-            varI = "%.8f" % (varX+float(mag+str(take)))
-            print("Trendmaster could BUY @",varI)
-            counter+=1
-        if varX > 1:#large coin processing
-            varI = varX/modS#adjust price
-            varI = "%.2f" % varI
-            print("Trendmaster could BUY @",varI)
-            counter+=1
-        try:
-            if varX > 1 and checkPos < load and checkPosX < profitLever and availBalance > safetyThreshold :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))
-                print("BUY @",varI)
+            if varX > 1:#large coin processing
+                varI = varX*modS#adjust price
+                varI = "%.2f" % varI
+                print("Trendmaster could SELL @",varI)
                 counter+=1
-                time.sleep(instance)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping  
-        if checkPosX+modG > abs(checkPosY) and checkPosX+modG >= profitLever*expectanceMultiplier and checkPosX > 0:
-            playsound('profit.mp3')
-            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-            print("Profit made!")
-            counter+=1
-            time.sleep(instance)
-        if checkPosX+modG < checkPosY and checkPosX+modG <= 0-profitLever*expectanceMultiplier and checkPosX < 0:
-            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-            print("Avoided loss!")
-            counter+=1
-            time.sleep(instance)
+            try:
+                if varX > 1 and checkPos > -1 and checkPosX < -0.1:
+                    order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+                    print("SELL @",varI)
+                    counter+=1
+                    init = 1
+                    time.sleep(instance)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+        if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+            if varX < 1:#alt coin processing
+                varZ = "%.8f" % varX
+                take = varZ.split('.')[1][-taker:]
+                i = 0
+                mag = "0."
+                while(i+len(str(take)) < len(str(varX))-2):
+                    mag+="0"
+                    i+=1
+                varI = "%.8f" % (varX+float(mag+str(take)))
+                print("Trendmaster could BUY @",varI)
+                counter+=1
+            if varX > 1:#large coin processing
+                varI = varX/modS#adjust price
+                varI = "%.2f" % varI
+                print("Trendmaster could BUY @",varI)
+                counter+=1
+            try:
+                if varX > 1 and checkPos < 1 and checkPosX < -0.1:
+                    order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+                    print("BUY @",varI)
+                    counter+=1
+                    init = 1
+                    time.sleep(instance)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+    if init == 1:  
+        if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+            if varX < 1:#alt coin processing
+                varZ = "%.8f" % varX
+                take = varZ.split('.')[1][-taker:]
+                i = 0
+                mag = "0."
+                while(i+len(str(take)) < len(str(varX))-2):
+                    mag+="0"
+                    i+=1
+                varI = "%.8f" % (varX+float(mag+str(take)))
+                print("Trendmaster could SELL @",varI)
+                counter+=1
+            if varX > 1:#large coin processing
+                varI = varX*modS#adjust price
+                varI = "%.2f" % varI
+                print("Trendmaster could SELL @",varI)
+                counter+=1
+            try:
+                if varX > 1 and checkPos > -1:
+                    order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+                    print("SELL @",varI)
+                    counter+=1
+                    init = 0
+                    time.sleep(instance)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+        if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+            if varX < 1:#alt coin processing
+                varZ = "%.8f" % varX
+                take = varZ.split('.')[1][-taker:]
+                i = 0
+                mag = "0."
+                while(i+len(str(take)) < len(str(varX))-2):
+                    mag+="0"
+                    i+=1
+                varI = "%.8f" % (varX+float(mag+str(take)))
+                print("Trendmaster could BUY @",varI)
+                counter+=1
+            if varX > 1:#large coin processing
+                varI = varX/modS#adjust price
+                varI = "%.2f" % varI
+                print("Trendmaster could BUY @",varI)
+                counter+=1
+            try:
+                if varX > 1 and checkPos < 1:
+                    order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
+                    print("BUY @",varI)
+                    counter+=1
+                    init = 0
+                    time.sleep(instance)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
     #and checkPosX >= profitLever*expectanceMultiplier #greed function    
     if counter >= refreshLimit:
         time.sleep(instance)
