@@ -21,7 +21,8 @@ profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 12
 load = 1
 refreshLimit = 5
-tickDefault = 0.10
+tickDefault = 0.001
+lossLimit = -0.001
 from playsound import playsound
 import requests
 import os
@@ -154,9 +155,15 @@ while(True):
     #Neural network prediction code
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
+    if checkPosX == 0:
+        init = 1
     if checkPosX > tick:
         tick+=tick
         playsound('profit.mp3')
+    print(checkPosX)
+
+    if checkPosX < lossLimit:
+        playsound('plzclose.mp3')
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     if init == 0:  
         if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
