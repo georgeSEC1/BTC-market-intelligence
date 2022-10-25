@@ -97,7 +97,6 @@ while(True):
     print()
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
     if refresh == 1:
-        cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
         tick = tickDefault
         xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
         TotalCheck = []
@@ -160,6 +159,7 @@ while(True):
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
     if checkPosX == 0:
         init = 1
+    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     indexB = market.get_ticker("BTCUSDTPERP")['bestAskPrice']
     checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
     checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
