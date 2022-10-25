@@ -171,9 +171,9 @@ while(True):
         if checkPos > 0 and checkPosY <= leverage-lever:
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
     if checkPosX < lossLimit:
-        if checkPos < 0 and checkPosY >= leverage+lever*leverMultiplier:
+        if checkPos < 0 and checkPosY >= leverage+(lever*leverMultiplier):
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-        if checkPos > 0 and checkPosY >= leverage+lever*leverMultiplier:
+        if checkPos > 0 and checkPosY >= leverage+(lever*leverMultiplier):
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
