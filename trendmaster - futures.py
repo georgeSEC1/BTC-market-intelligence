@@ -160,17 +160,19 @@ while(True):
     indexB = market.get_ticker("BTCUSDTPERP")['bestAskPrice']
     checkPosY = trade.get_position_details("BTCUSDTPERP")['currentCost']*1000
     if checkPosX > tick:
-        if checkPos < 0 and indexB < checkPosY:
+        if checkPos < 0 and float(indexB) < float(checkPosY):
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-        if checkPos > 0 and indexB > checkPosY:
+            playsound('profit.mp3')
+        if checkPos > 0 and float(indexB) > float(checkPosY):
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-        playsound('profit.mp3')
+            playsound('profit.mp3')
     if checkPosX < lossLimit:
         if checkPos < 0:
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
+            playsound('close.mp3')
         if checkPos > 0:
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-        playsound('close.mp3')
+            playsound('close.mp3')
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
