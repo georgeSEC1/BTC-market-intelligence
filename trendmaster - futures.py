@@ -16,7 +16,9 @@ modB = 1.00005#Buy multiplier
 modS = 1.00005#Sell multiplier
 modG = 1.28#generic multiplier
 leverage = 100
-amount = 1
+lever = 5
+leverMultiplier = 3
+amount = 5
 profitLever = 0.01/leverage#Pct
 expectanceMultiplier = 12
 load = 1
@@ -95,6 +97,7 @@ while(True):
     print()
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
     if refresh == 1:
+        cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
         tick = tickDefault
         xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
         TotalCheck = []
@@ -158,22 +161,20 @@ while(True):
     if checkPosX == 0:
         init = 1
     indexB = market.get_ticker("BTCUSDTPERP")['bestAskPrice']
-    checkPosY = trade.get_position_details("BTCUSDTPERP")['currentCost']*1000
+    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
+    checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
+    checkPosY = trade.get_position_details("BTCUSDTPERP")['realLeverage']
+    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
     if checkPosX > tick:
-        if checkPos < 0 and float(indexB) < float(checkPosY):
+        if checkPos < 0 and checkPosY <= leverage-lever:
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-            playsound('profit.mp3')
-        if checkPos > 0 and float(indexB) > float(checkPosY):
+        if checkPos > 0 and checkPosY <= leverage-lever:
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-            playsound('profit.mp3')
     if checkPosX < lossLimit:
-        if checkPos < 0:
+        if checkPos < 0 and checkPosY >= leverage+lever*leverMultiplier:
             order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-            playsound('close.mp3')
-        if checkPos > 0:
+        if checkPos > 0 and checkPosY >= leverage+lever*leverMultiplier:
             order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-            playsound('close.mp3')
-    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         if varX < 1:#alt coin processing
             varZ = "%.8f" % varX
@@ -192,7 +193,7 @@ while(True):
             print("Trendmaster could SELL @",varI)
             counter+=1
         try:
-            if varX > 1 and checkPos > -1:
+            if varX > 1 and checkPos == 0 and checkB == 0 and checkS == 0:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("SELL @",varI)
                 counter+=1
@@ -218,7 +219,7 @@ while(True):
             print("Trendmaster could BUY @",varI)
             counter+=1
         try:
-            if varX > 1 and checkPos < 1:
+            if varX > 1 and checkPos == 0 and checkB == 0 and checkS == 0:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
                 print("BUY @",varI)
                 counter+=1
