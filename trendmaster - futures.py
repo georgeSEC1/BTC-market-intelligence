@@ -8,24 +8,12 @@ print()
 print("==================================================================================================")
 print()
 #Account Keys
-API_KEY = ""
-SECRET = ""
+API_KEY = "6366153b2fc84000085bd5f5"
+SECRET = "6c02a181-5041-4a92-95e8-9f2ec601a561"
 API_PASS = input("Please enter account password: ")
-safetyThreshold = 1#stop trading if balance is under safetyThreshold
-modB = 1.00005#Buy multiplier
-modS = 1.00005#Sell multiplier
-modG = 1.28#generic multiplier
-leverage = 100
-lever = 5
-leverMultiplier = 3
-amount = 5
-profitLever = 0.01/leverage#Pct
-expectanceMultiplier = 12
-load = 1
-refreshLimit = 5
-tickDefault = 0.00015 #0.0005 = 5%
-lossLimit = -0.0005
-from playsound import playsound
+leverage = 20
+risk = 1
+amount = 1
 import requests
 import os
 import keras
@@ -36,10 +24,10 @@ from numpy import loadtxt
 import time
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 import os
 from polofutures import RestClient
 import traceback
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 rest_client = RestClient(API_KEY, SECRET, API_PASS)
 SYMBOL = 'BTCUSDTPERP'
 # Trade Functions
@@ -47,10 +35,7 @@ trade = rest_client.trade_api()
 market = rest_client.market_api()
 user = rest_client.user_api()
 var = 8
-taker = 3#dev only
-stat = 0
 index = 0
-instance = 5
 def download_resource(proc,url,mode):#multithreading capable downloader, NN multimode
     try:
         valY = index 
@@ -88,59 +73,46 @@ def download_resource(proc,url,mode):#multithreading capable downloader, NN mult
         return rx.status_code
     except requests.exceptions.RequestException as e:#added exception to avoid completely stopping
        return e
-counter = 0
-refresh = 1
-init = 1
 while(True):
     print()
     print("==================================================================================================")
     print()
-    index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
-    if refresh == 1:
-        tick = tickDefault
-        xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
-        TotalCheck = []
-        totalPAIR = []
-        print()
-        print("==================================================================================================")
-        print()
-        print("Loading...")
-        print()
-        print("==================================================================================================")
-        print()
-        url_list = []
-        r = requests.get("https://poloniex.com/public?command=return24hVolume")#get volume
-        string = r.text
-        TotalCheck = []
-        totalPAIR = []
-        for line in string.split(","):
-            if line.find("_") > -1 and line.find("BTC") > -1:     
-                proc = line.split("\"")[1]
-                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")#get candle data iterator
-                TotalCheck.append(proc)
-        threads = []
-        with ThreadPoolExecutor(max_workers=200) as executor:#multithreading
-            i = 0
-            for url in url_list:
-                if i < len(TotalCheck):
-                    threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
-                i+=1
-        #Neural network training code
-        dataset = loadtxt('test.csv', delimiter=',')
-        X = dataset[:,0:var]
-        y = dataset[:,var]
-        model = Sequential()
-        model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
-        model.add(Dense(50, activation='relu'))
-        model.add(Dense(1, activation='sigmoid'))
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        model.fit(X, y, epochs=150, batch_size=10, verbose=0)
-        model.save('my_model')
-        #Neural network training code
-        refresh = 0
-        print()
-        print("==================================================================================================")
-        print()
+    xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
+    TotalCheck = []
+    totalPAIR = []
+    url_list = []
+    r = requests.get("https://poloniex.com/public?command=return24hVolume")#get volume
+    string = r.text
+    TotalCheck = []
+    totalPAIR = []
+    for line in string.split(","):
+        if line.find("_") > -1 and line.find("BTC") > -1:     
+            proc = line.split("\"")[1]
+            url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")#get candle data iterator
+            TotalCheck.append(proc)
+    threads = []
+    with ThreadPoolExecutor(max_workers=200) as executor:#multithreading
+        i = 0
+        for url in url_list:
+            if i < len(TotalCheck):
+                threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
+            i+=1
+    #Neural network training code
+    dataset = loadtxt('test.csv', delimiter=',')
+    X = dataset[:,0:var]
+    y = dataset[:,var]
+    model = Sequential()
+    model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.fit(X, y, epochs=150, batch_size=10, verbose=0)
+    model.save('my_model')
+    #Neural network training code
+    refresh = 0
+    print()
+    print("==================================================================================================")
+    print()
     #for PAIR in totalPAIR:
     #Neural network prediction code
     PAIR = "BTC_USDT"
@@ -157,84 +129,34 @@ while(True):
     #Neural network prediction code
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
     checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
-    if checkPosX == 0:
-        init = 1
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
-    indexB = market.get_ticker("BTCUSDTPERP")['bestAskPrice']
-    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
-    checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
-    checkPosY = trade.get_position_details("BTCUSDTPERP")['realLeverage']
-    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
-    if checkPosX > tick:
-        if checkPos < 0 and checkPosY <= leverage-lever:
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-        if checkPos > 0 and checkPosY <= leverage-lever:
-            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-    if checkPosX < lossLimit:
-        if checkPos < 0 and checkPosY >= leverage+(lever*leverMultiplier):
-            order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount,indexB)#symbol,side,leverage,quantity,price
-        if checkPos > 0 and checkPosY >= leverage+(lever*leverMultiplier):
-            order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,indexB)#symbol,side,leverage,quantity,price
+    index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
+    check = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
+    checkPos = trade.get_position_details("BTCUSDTPERP")['realLeverage']#position information
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
-        if varX < 1:#alt coin processing
-            varZ = "%.8f" % varX
-            take = varZ.split('.')[1][-taker:]
-            i = 0
-            mag = "0."
-            while(i+len(str(take)) < len(str(varX))-2):
-                mag+="0"
-                i+=1
-            varI = "%.8f" % (varX+float(mag+str(take)))
-            print("Trendmaster could SELL @",varI)
-            counter+=1
-        if varX > 1:#large coin processing
-            varI = varX*modS#adjust price
-            varI = "%.2f" % varI
-            print("Trendmaster could SELL @",varI)
-            counter+=1
         try:
-            if varX > 1 and checkPos == 0 and checkB == 0 and checkS == 0:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
-                print("SELL @",varI)
-                counter+=1
-                init = 1
-                time.sleep(instance)
+            if check < risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("SELL @",index)
+            if checkPos > leverage-(leverage*0.1) and checkPos < leverage+(leverage*0.1) and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("BUY @",index)
+            if checkPos > leverage+(leverage*0.1) and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("BUY @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
+    check = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
-        if varX < 1:#alt coin processing
-            varZ = "%.8f" % varX
-            take = varZ.split('.')[1][-taker:]
-            i = 0
-            mag = "0."
-            while(i+len(str(take)) < len(str(varX))-2):
-                mag+="0"
-                i+=1
-            varI = "%.8f" % (varX+float(mag+str(take)))
-            print("Trendmaster could BUY @",varI)
-            counter+=1
-        if varX > 1:#large coin processing
-            varI = varX/modS#adjust price
-            varI = "%.2f" % varI
-            print("Trendmaster could BUY @",varI)
-            counter+=1
         try:
-            if varX > 1 and checkPos == 0 and checkB == 0 and checkS == 0:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, str(round(float(varI))))#symbol,side,leverage,quantity,price
-                print("BUY @",varI)
-                counter+=1
-                init = 1
-                time.sleep(instance)
+            if check < risk:
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("BUY @",index)
+            if checkPos > leverage-(leverage*0.1) and checkPos < leverage+(leverage*0.1) and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("SELL @",index)
+            if checkPos > leverage+(leverage*0.1) and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-    if counter >= refreshLimit:
-        time.sleep(instance)
-        print()
-        print("==================================================================================================")
-        print()
-        print("Refreshing Trendmaster")
-        print()
-        print("==================================================================================================")
-        print()
-        refresh = 1
-        counter = 0
