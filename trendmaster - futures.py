@@ -8,8 +8,8 @@ print()
 print("==================================================================================================")
 print()
 #Account Keys
-API_KEY = "6366153b2fc84000085bd5f5"
-SECRET = "6c02a181-5041-4a92-95e8-9f2ec601a561"
+API_KEY = ""
+SECRET = ""
 API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
@@ -128,9 +128,9 @@ while(True):
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     #Neural network prediction code
     checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
-    checkPosX = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']#position information
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
+    indexB = trade.get_position_details("BTCUSDTPERP")['markPrice']#Get index price
     check = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
     checkPos = trade.get_position_details("BTCUSDTPERP")['realLeverage']#position information
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
@@ -138,11 +138,11 @@ while(True):
             if check < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
-            if checkPos > leverage-(leverage*0.1) and checkPos < leverage+(leverage*0.1) and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+            if checkPos < 15 and checkPos > 25 and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, indexB)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
-            if checkPos > leverage+(leverage*0.1) and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+            if checkPos < 15 and checkPos > 25 and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, indexB)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
@@ -152,11 +152,11 @@ while(True):
             if check < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
-            if checkPos > leverage-(leverage*0.1) and checkPos < leverage+(leverage*0.1) and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+            if checkPos < 15 and checkPos > 25 and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, indexB)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
-            if checkPos > leverage+(leverage*0.1) and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+            if checkPos < 15 and checkPos > 25 and check >= risk :
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, indexB)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
