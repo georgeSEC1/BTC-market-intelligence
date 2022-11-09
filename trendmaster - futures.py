@@ -14,8 +14,8 @@ API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
 amount = 1
-losslimit = 0.1
-gainlimit = 0.1
+losslimit = 0.7
+gainlimit = 0.3
 import requests
 import os
 import keras
@@ -145,7 +145,7 @@ while(True):
             if realisedGrossPnl > gainlimit and check >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
-            if unrealisedPnl < losslimit and check >= risk:
+            if realisedGrossPnl < losslimit and check >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
         except:
@@ -159,7 +159,7 @@ while(True):
             if realisedGrossPnl > gainlimit and check >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
-            if unrealisedPnl < losslimit and check >= risk:
+            if realisedGrossPnl < losslimit and check >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
