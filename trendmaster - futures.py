@@ -15,7 +15,7 @@ leverage = 20
 risk = 1
 amount = 1
 losslimit = 0.7
-gainlimit = 0.3
+gainlimit = 1.3
 import requests
 import os
 import keras
