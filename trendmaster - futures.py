@@ -14,6 +14,8 @@ API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
 amount = 1
+losslimit = 0.1
+gainlimit = 0.1
 import requests
 import os
 import keras
@@ -132,17 +134,19 @@ while(True):
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
     indexB = trade.get_position_details("BTCUSDTPERP")['markPrice']#Get index price
     check = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
-    checkPos = trade.get_position_details("BTCUSDTPERP")['realLeverage']#position information
+    realisedGrossPnl = trade.get_position_details("BTCUSDTPERP")['realisedGrossPnl']#position information
+    unrealisedPnl = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
+    print("realisedGrossPnl =", realisedGrossPnl,"unrealisedPnl =", unrealisedPnl)
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
             if check < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
-            if checkPos < 15 and checkPos > 25 and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, indexB)#symbol,side,leverage,quantity,price
+            if realisedGrossPnl > gainlimit and check >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
-            if checkPos < 15 and checkPos > 25 and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, indexB)#symbol,side,leverage,quantity,price
+            if unrealisedPnl < losslimit and check >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
@@ -152,11 +156,11 @@ while(True):
             if check < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
-            if checkPos < 15 and checkPos > 25 and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, indexB)#symbol,side,leverage,quantity,price
+            if realisedGrossPnl > gainlimit and check >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
-            if checkPos < 15 and checkPos > 25 and check >= risk :
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, indexB)#symbol,side,leverage,quantity,price
+            if unrealisedPnl < losslimit and check >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
