@@ -139,28 +139,16 @@ while(True):
     print("realisedGrossPnl =", realisedGrossPnl,"unrealisedPnl =", unrealisedPnl)
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
-            if check < risk:
+            if check < risk or realisedGrossPnl > gainlimit:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
-            if realisedGrossPnl > gainlimit and check >= risk:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("BUY @",index)
-            if realisedGrossPnl < losslimit and check >= risk:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("BUY @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
     check = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
-            if check < risk:
+            if check < risk or realisedGrossPnl > gainlimit:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
-            if realisedGrossPnl > gainlimit and check >= risk:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("SELL @",index)
-            if realisedGrossPnl < losslimit and check >= risk:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
