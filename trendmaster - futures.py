@@ -16,6 +16,9 @@ risk = 1
 amount = 1
 losslimit = 0.7
 gainlimit = 1.3
+latentImprove = 5
+from datetime import datetime
+from threading import Timer
 import requests
 import os
 import keras
@@ -75,80 +78,110 @@ def download_resource(proc,url,mode):#multithreading capable downloader, NN mult
         return rx.status_code
     except requests.exceptions.RequestException as e:#added exception to avoid completely stopping
        return e
-while(True):
-    print()
-    print("==================================================================================================")
-    print()
-    xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
-    TotalCheck = []
-    totalPAIR = []
-    url_list = []
-    r = requests.get("https://poloniex.com/public?command=return24hVolume")#get volume
-    string = r.text
-    TotalCheck = []
-    totalPAIR = []
-    for line in string.split(","):
-        if line.find("_") > -1 and line.find("BTC") > -1:     
-            proc = line.split("\"")[1]
-            url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")#get candle data iterator
-            TotalCheck.append(proc)
-    threads = []
-    with ThreadPoolExecutor(max_workers=200) as executor:#multithreading
-        i = 0
-        for url in url_list:
-            if i < len(TotalCheck):
-                threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
-            i+=1
-    #Neural network training code
-    dataset = loadtxt('test.csv', delimiter=',')
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    model = Sequential()
-    model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
-    model.add(Dense(50, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X, y, epochs=150, batch_size=10, verbose=0)
-    model.save('my_model')
-    #Neural network training code
-    refresh = 0
-    print()
-    print("==================================================================================================")
-    print()
-    #for PAIR in totalPAIR:
-    #Neural network prediction code
-    PAIR = "BTC_USDT"
-    url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
-    download_resource(PAIR,url,1)
-    dataset = loadtxt('realtime.csv', delimiter=',')
-    X = dataset[:,0:var]
-    y = dataset[:,var]
-    varX = float(X[0][2])
-    model = keras.models.load_model('my_model')
-    predictions = (model.predict(X) > 0.5).astype(int)
-    print ("Price category & movement indicator for:", PAIR)
-    print('%s => %d' % (X[0].tolist(), predictions[0]))
-    #Neural network prediction code
-    checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
-    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
-    index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
-    indexB = trade.get_position_details("BTCUSDTPERP")['markPrice']#Get index price
-    check = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
-    realisedGrossPnl = trade.get_position_details("BTCUSDTPERP")['realisedGrossPnl']#position information
-    unrealisedPnl = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
-    print("realisedGrossPnl =", realisedGrossPnl,"unrealisedPnl =", unrealisedPnl)
-    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
-        try:
-            if check < risk or realisedGrossPnl > gainlimit:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("SELL @",index)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
-    check = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
-    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
-        try:
-            if check < risk or realisedGrossPnl > gainlimit:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("BUY @",index)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
+print("please run before 8pm AEDT for optimal profits")
+def job1():
+    for cycle in range(15):
+        print()
+        print("==================================================================================================")
+        print()
+        xxx = open("test.csv", "w", encoding="utf8")#prepare file save logic
+        TotalCheck = []
+        totalPAIR = []
+        url_list = []
+        r = requests.get("https://poloniex.com/public?command=return24hVolume")#get volume
+        string = r.text
+        TotalCheck = []
+        totalPAIR = []
+        for line in string.split(","):
+            if line.find("_") > -1 and line.find("BTC") > -1:     
+                proc = line.split("\"")[1]
+                url_list.append("https://api.poloniex.com/markets/"+proc+"/candles?interval=MINUTE_1")#get candle data iterator
+                TotalCheck.append(proc)
+        threads = []
+        with ThreadPoolExecutor(max_workers=200) as executor:#multithreading
+            i = 0
+            for url in url_list:
+                if i < len(TotalCheck):
+                    threads.append(executor.submit(download_resource,TotalCheck[i], url,0))
+                i+=1
+        #Neural network training code
+        dataset = loadtxt('test.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        model = Sequential()
+        model.add(Dense(120, input_shape=(X.shape[-1],), activation='relu'))
+        model.add(Dense(50, activation='relu'))
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.fit(X, y, epochs=150, batch_size=10, verbose=0)
+        model.save('my_model')
+        #Neural network training code
+        print()
+        print("==================================================================================================")
+        print()
+        #for PAIR in totalPAIR:
+        #Neural network prediction code
+        PAIR = "BTC_USDT"
+        url = "https://api.poloniex.com/markets/"+PAIR+"/candles?interval=MINUTE_1"
+        download_resource(PAIR,url,1)
+        dataset = loadtxt('realtime.csv', delimiter=',')
+        X = dataset[:,0:var]
+        y = dataset[:,var]
+        varX = float(X[0][2])
+        model = keras.models.load_model('my_model')
+        predictions = (model.predict(X) > 0.5).astype(int)
+        print ("Price category & movement indicator for:", PAIR)
+        print('%s => %d' % (X[0].tolist(), predictions[0]))
+        #Neural network prediction code
+        checkPos = trade.get_position_details("BTCUSDTPERP")['currentQty']#position information
+        cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
+        index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
+        indexB = trade.get_position_details("BTCUSDTPERP")['markPrice']#Get index price
+        check = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
+        realisedGrossPnl = trade.get_position_details("BTCUSDTPERP")['realisedGrossPnl']#position information
+        unrealisedPnl = trade.get_position_details("BTCUSDTPERP")['unrealisedPnl']#position information
+        print("realisedGrossPnl =", realisedGrossPnl,"unrealisedPnl =", unrealisedPnl)
+        if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+            try:
+                if check < risk:
+                    order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                    print("SELL @",index)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+        check = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
+        if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+            try:
+                if check < risk:
+                    order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                    print("BUY @",index)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+    checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
+    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']            
+    if checkS > 0:
+        order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, latentImprove, index)#symbol,side,leverage,quantity,price
+    if checkB > 0:
+        order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, latentImprove, index)#symbol,side,leverage,quantity,price
+def job2():
+    checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
+    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
+    if checkS > 0:
+        order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, checkS, index)#symbol,side,leverage,quantity,price
+    if checkB > 0:
+        order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, checkB, index)#symbol,side,leverage,quantity,price
+#schedules
+schedule.every().monday.at("21:00").do(job1)
+schedule.every().tuesday.at("21:00").do(job1)
+schedule.every().wednesday.at("21:00").do(job1)
+schedule.every().thursday.at("21:00").do(job1)
+schedule.every().friday.at("21:00").do(job1)
+
+schedule.every().monday.at("9:00").do(job2)
+schedule.every().tuesday.at("9:00").do(job2)
+schedule.every().wednesday.at("9:00").do(job2)
+schedule.every().thursday.at("9:00").do(job2)
+schedule.every().friday.at("9:00").do(job2)
+#do schedule
+while True:
+    schedule.run_pending()
+    time.sleep(1)
