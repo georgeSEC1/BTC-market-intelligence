@@ -149,38 +149,3 @@ for j in range(17):
                 print("BUY @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-def job1():  
-    checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
-    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']            
-    if checkS > 0:
-        order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, latentImprove, index)#symbol,side,leverage,quantity,price
-    if checkB > 0:
-        order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, latentImprove, index)#symbol,side,leverage,quantity,price
-def job2():
-    checkS = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
-    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
-    if checkS > 0:
-        order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, checkS, index)#symbol,side,leverage,quantity,price
-    if checkB > 0:
-        order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, checkB, index)#symbol,side,leverage,quantity,price
-    os.execv(sys.argv[0], sys.argv)
-    sys.exit()
-#schedules
-print("please run before 8pm AEDT for optimal trade position")
-print("for optimal profits Trendmaster will increase the quantity of the desirable position at a specific time")
-print("profits will be gained the next day depending on the time zone and desired time")
-schedule.every().monday.at("21:00").do(job1)
-schedule.every().tuesday.at("21:00").do(job1)
-schedule.every().wednesday.at("21:00").do(job1)
-schedule.every().thursday.at("21:00").do(job1)
-schedule.every().friday.at("21:00").do(job1)
-
-schedule.every().monday.at("09:00").do(job2)
-schedule.every().tuesday.at("09:00").do(job2)
-schedule.every().wednesday.at("09:00").do(job2)
-schedule.every().thursday.at("09:00").do(job2)
-schedule.every().friday.at("09:00").do(job2)
-#do schedule
-while True:
-    schedule.run_pending()
-    time.sleep(1)
