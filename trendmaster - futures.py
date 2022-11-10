@@ -17,8 +17,7 @@ amount = 1
 losslimit = 0.7
 gainlimit = 1.3
 latentImprove = 5
-from datetime import datetime
-from threading import Timer
+import schedule
 import requests
 import os
 import keras
@@ -176,11 +175,11 @@ schedule.every().wednesday.at("21:00").do(job1)
 schedule.every().thursday.at("21:00").do(job1)
 schedule.every().friday.at("21:00").do(job1)
 
-schedule.every().monday.at("9:00").do(job2)
-schedule.every().tuesday.at("9:00").do(job2)
-schedule.every().wednesday.at("9:00").do(job2)
-schedule.every().thursday.at("9:00").do(job2)
-schedule.every().friday.at("9:00").do(job2)
+schedule.every().monday.at("09:00").do(job2)
+schedule.every().tuesday.at("09:00").do(job2)
+schedule.every().wednesday.at("09:00").do(job2)
+schedule.every().thursday.at("09:00").do(job2)
+schedule.every().friday.at("09:00").do(job2)
 #do schedule
 while True:
     schedule.run_pending()
