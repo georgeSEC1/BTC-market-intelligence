@@ -157,14 +157,14 @@ while(True):
             traceback.print_exc()#added exception to avoid completely stopping
     if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
-            if checkA < risk and checkB < risk:
+            if checkA < risk != checkB < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
-            if checkA < risk and checkB < risk:
+            if checkA < risk != checkB < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
         except:
