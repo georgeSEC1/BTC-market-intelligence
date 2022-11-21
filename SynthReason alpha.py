@@ -63,7 +63,6 @@ with open("fileList.conf", encoding='ISO-8859-1') as f:
                 sentences = convert(text)
                 sentences = np.array(sentences)
                 sentences = sentences[:partition*targetNgramSize].reshape(partition, targetNgramSize)
-                random.shuffle(sentences)
                 for sentence in list(set(map(tuple,reversed(sentences)))):
                     sync += ' '.join(sentence) + " "
                 print()
