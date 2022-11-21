@@ -15,7 +15,7 @@ leverage = 20
 risk = 1
 amount = 1
 loss = -0.125
-gain = 0.25
+gain = 0.45
 import requests
 import os
 import sys
@@ -132,7 +132,7 @@ while(True):
     #Neural network prediction code
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
-    unrealisedPnlPcnt = trade.get_open_order_details("BTCUSDTPERP")['unrealisedPnlPcnt']
+    unrealisedPnlPcnt = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']
     checkA = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
     checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
     if unrealisedPnlPcnt < loss:#TODO: adjust values, fix "invalid price", adjust scaling 
