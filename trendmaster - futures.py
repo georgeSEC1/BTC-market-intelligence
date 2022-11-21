@@ -14,8 +14,8 @@ API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
 amount = 1
-loss = -0.125
-gain = 0.45
+loss = -0.125 #1 = 100%
+gain = 0.45 #1 = 100%
 import requests
 import os
 import sys
@@ -135,7 +135,7 @@ while(True):
     unrealisedPnlPcnt = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']
     checkA = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
     checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
-    if unrealisedPnlPcnt < loss:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if unrealisedPnlPcnt < loss*leverage:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
             if checkA >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
@@ -145,7 +145,7 @@ while(True):
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-    if unrealisedPnlPcnt > gain:#TODO: adjust values, fix "invalid price", adjust scaling 
+    if unrealisedPnlPcnt > gain*leverage:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
             if checkA >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
