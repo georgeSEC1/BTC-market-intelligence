@@ -14,9 +14,8 @@ API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
 amount = 1
-losslimit = 0.7
-gainlimit = 1.3
-import schedule
+loss = -0.125
+gain = 0.25
 import requests
 import os
 import sys
@@ -77,7 +76,7 @@ def download_resource(proc,url,mode):#multithreading capable downloader, NN mult
         return rx.status_code
     except requests.exceptions.RequestException as e:#added exception to avoid completely stopping
        return e
-for j in range(17):
+while(True):
     print()
     print("==================================================================================================")
     print()
@@ -133,19 +132,41 @@ for j in range(17):
     #Neural network prediction code
     cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
-    check = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
-    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+    unrealisedPnlPcnt = trade.get_open_order_details("BTCUSDTPERP")['unrealisedPnlPcnt']
+    checkA = trade.get_open_order_details("BTCUSDTPERP")['openOrderSellSize']
+    checkB = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
+    if unrealisedPnlPcnt < loss:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
-            if check < risk:
+            if checkA >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("BUY @",index)
+            if checkB >= risk:
                 order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
-    check = trade.get_open_order_details("BTCUSDTPERP")['openOrderBuySize']
+    if unrealisedPnlPcnt > gain:#TODO: adjust values, fix "invalid price", adjust scaling 
+        try:
+            if checkA >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("BUY @",index)
+            if checkB >= risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("SELL @",index)
+        except:
+            traceback.print_exc()#added exception to avoid completely stopping
+    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+        try:
+            if checkA < risk and checkB < risk:
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                print("SELL @",index)
+        except:
+            traceback.print_exc()#added exception to avoid completely stopping
     if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
-            if check < risk:
+            if checkA < risk and checkB < risk:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
+   
