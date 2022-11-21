@@ -14,8 +14,9 @@ API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
 amount = 1
-loss = -0.125 #1 = 100%
-gain = 0.45 #1 = 100%
+profitMultiplier = 1.001
+loss = -0.06 #1 = 100%
+gain = 0.05 #1 = 100%
 import requests
 import os
 import sys
@@ -134,23 +135,24 @@ while(True):
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
     unrealisedPnlPcnt = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']
     check = trade.get_position_details("BTCUSDTPERP")['currentQty']
+    profitMaker = trade.get_position_details("BTCUSDTPERP")['avgEntryPrice']
     if unrealisedPnlPcnt < loss*leverage:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
             if check < 0:
                 order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
             if check > 0:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,  index)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
     if unrealisedPnlPcnt > gain*leverage:#TODO: adjust values, fix "invalid price", adjust scaling 
         try:
             if check < 0:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, profitMaker*profitMultiplier)#symbol,side,leverage,quantity,price
                 print("BUY @",index)
             if check > 0:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, profitMaker/profitMultiplier)#symbol,side,leverage,quantity,price
                 print("SELL @",index)
         except:
             traceback.print_exc()#added exception to avoid completely stopping
