@@ -14,9 +14,10 @@ API_PASS = input("Please enter account password: ")
 leverage = 20
 risk = 1
 amount = 1
-profitMultiplier = 1.001
-loss = -0.06 #1 = 100%
-gain = 0.05 #1 = 100%
+profitMultiplier = 1.002
+loss = -0.001 #-0.001  = -1%
+gain = 0.0007 #0.0015 = 1.5%
+delay = 10
 import requests
 import os
 import sys
@@ -31,6 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 from polofutures import RestClient
 import traceback
+from pygame import mixer
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 rest_client = RestClient(API_KEY, SECRET, API_PASS)
 SYMBOL = 'BTCUSDTPERP'
@@ -77,6 +79,9 @@ def download_resource(proc,url,mode):#multithreading capable downloader, NN mult
         return rx.status_code
     except requests.exceptions.RequestException as e:#added exception to avoid completely stopping
        return e
+counter = 0
+mixer.init()
+mixer.music.load("profit.mp3")
 while(True):
     print()
     print("==================================================================================================")
@@ -131,43 +136,53 @@ while(True):
     print ("Price category & movement indicator for:", PAIR)
     print('%s => %d' % (X[0].tolist(), predictions[0]))
     #Neural network prediction code
-    cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
+    if counter > delay:
+        cancel_all = trade.cancel_all_limit_orders("BTCUSDTPERP")
+        counter = 0
     index = round(float(market.get_ticker("BTCUSDTPERP")['price']))#Get index price
     unrealisedPnlPcnt = trade.get_position_details("BTCUSDTPERP")['unrealisedPnlPcnt']
     check = trade.get_position_details("BTCUSDTPERP")['currentQty']
     profitMaker = trade.get_position_details("BTCUSDTPERP")['avgEntryPrice']
-    if unrealisedPnlPcnt < loss*leverage:#TODO: adjust values, fix "invalid price", adjust scaling 
-        try:
-            if check < 0:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("BUY @",index)
-            if check > 0:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,  index)#symbol,side,leverage,quantity,price
-                print("SELL @",index)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
-    if unrealisedPnlPcnt > gain*leverage:#TODO: adjust values, fix "invalid price", adjust scaling 
-        try:
-            if check < 0:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, profitMaker*profitMultiplier)#symbol,side,leverage,quantity,price
-                print("BUY @",index)
-            if check > 0:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, profitMaker/profitMultiplier)#symbol,side,leverage,quantity,price
-                print("SELL @",index)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
-    if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
-        try:
-            if abs(check) < risk:
-                order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("SELL @",index)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
-    if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
-        try:
-            if abs(check) < risk:
-                order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
-                print("BUY @",index)
-        except:
-            traceback.print_exc()#added exception to avoid completely stopping
+    check2 = trade.get_open_order_details(("BTCUSDTPERP"))['openOrderBuySize']
+    check3 = trade.get_open_order_details(("BTCUSDTPERP"))['openOrderSellSize']
+    if check2 <= risk and check3 <= risk:
+        if unrealisedPnlPcnt < loss:#TODO: adjust values, fix "invalid price", adjust scaling 
+            try:
+                if check < 0:
+                    order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                    print("BUY @",index)
+                if check > 0:
+                    order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount,  index)#symbol,side,leverage,quantity,price
+                    print("SELL @",index)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+    if check2 <= risk and check3 <= risk:
+        if unrealisedPnlPcnt > gain:#TODO: adjust values, fix "invalid price", adjust scaling 
+            try:
+                if check < 0:
+                    order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, round(profitMaker*profitMultiplier))
+                    print("BUY @",index)
+                    mixer.music.play()
+                if check > 0:
+                    order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, round(profitMaker/profitMultiplier))
+                    print("SELL @",index)
+                    mixer.music.play()
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+    if check2 < risk and check3 < risk:
+        if predictions[0][0] == 0:#TODO: adjust values, fix "invalid price", adjust scaling 
+            try:
+                if abs(check) < risk:
+                    order_id = trade.create_limit_order(SYMBOL, 'sell', leverage, amount, index)#symbol,side,leverage,quantity,price
+                    print("SELL @",index)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+        if predictions[0][0] == 1:#TODO: adjust values, fix "invalid price", adjust scaling 
+            try:
+                if abs(check) < risk:
+                    order_id = trade.create_limit_order(SYMBOL, 'buy', leverage, amount, index)#symbol,side,leverage,quantity,price
+                    print("BUY @",index)
+            except:
+                traceback.print_exc()#added exception to avoid completely stopping
+    counter+=1
    
